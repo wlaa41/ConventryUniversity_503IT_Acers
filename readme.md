@@ -3,7 +3,7 @@
 ## Module Information
 **Module Name:** Communication and Collaboration (503IT)  
 **University:** Coventry University  
-**Teacher:** Will (Best Teacher 😊)
+**Teacher:** Will (Best Teacher 😊) 
 
 ---
 
