@@ -10,6 +10,7 @@
 ## Team Members
 - Roshana Khadka – 16318254  
 - Sarthak Lamichhane – 15903541  
+- Suresh Sapkota - 16028744
 
 ---
 
