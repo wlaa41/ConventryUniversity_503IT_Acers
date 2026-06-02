@@ -8,14 +8,16 @@
 ---
 
 ## Team Members
-- Roshana Khadka – 16318254  
-- Sarthak Lamichhane – 15903541  
-- Suresh Sapkota - 16028744
+- Roshana Khadka – 16318254 - ginmartinii
+- Sarthak Lamichhane – 15903541 - sarthak-44
+- Suresh Sapkota - 16028744 - Sureshh369
+- Yuwan Shakya - 15949044 - yuwansqya16-stack
+- 
 
 ---
 
 ## Project Overview
-This project is an educational game designed to teach cyber security concepts in an interactive and engaging way. The game helps players understand common cyber threats, safe online practices, and basic security principles through gameplay and collaboration.
+This project is an educational game designed to teach cybersecurity concepts interactively and engagingly. The game helps players understand common cyber threats, safe online practices, and basic security principles through gameplay and collaboration.
 
 The project was developed as part of the 503IT Communication and Collaboration module, with a focus on teamwork, communication, and Agile development practices.
 
