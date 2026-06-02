@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ClickBait - Fixed Wide Maze</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="wrapper">
+  <h1>ClickBait</h1>
+  <p class="subtitle">Fixed version: wider paths, working enemy movement, and door questions pop up correctly.</p>
+
+  <div class="hud">
+    <div>Score: <span id="score">0</span></div>
+    <div>Best: <span id="bestScore">0</span></div>
+    <div>Health: <span id="health">20</span>/20</div>
+    <div>Time: <span id="time">00:00</span></div>
+    <div>Best Time: <span id="bestTime">--:--</span></div>
+    <div>Badge: <span id="badge">None</span></div>
+    <div>Doors: <span id="doorsHud">0/7</span></div>
+    <div>Enemy: <span id="enemySpeedHud">1.20</span></div>
+  </div>
+
+  <div id="gameBox">
+    <canvas id="game" width="1160" height="680"></canvas>
+
+    <div id="toast">
+      Reach Door 1. Question opens when you touch the door or stand beside it.
+    </div>
+
+    <div id="startModal" class="modal active">
+      <div class="modal-card">
+        <h2>Welcome to ClickBait</h2>
+        <p class="small-text">
+          Fixed properly: the paths are wider, the enemy now moves, and the cybersecurity question
+          opens when you reach the door from the next tile. Locked doors block the player, but not the enemy pathfinding.
+        </p>
+        <button class="restart-btn" onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+
+    <div id="questionModal" class="modal">
+      <div class="modal-card">
+        <h2 id="questionTitle">Cyber Door Challenge</h2>
+        <p class="question" id="questionText"></p>
+        <div class="answers" id="answers"></div>
+        <p id="feedback"></p>
+      </div>
+    </div>
+
+    <div id="endModal" class="modal">
+      <div class="modal-card">
+        <h2 id="endTitle">Game Over</h2>
+        <p id="endText" class="small-text"></p>
+        <button class="restart-btn" onclick="restartGame()">Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">Controls: Arrow Keys or WASD</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
