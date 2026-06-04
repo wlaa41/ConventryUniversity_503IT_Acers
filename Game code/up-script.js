@@ -1,6 +1,7 @@
 const TILE = 40;
 const COLS = 29;
 const ROWS = 17;
+
 const TOTAL_HEALTH = 20;
 const REVIVE_COST = 3;
 const QUESTION_TIME = 18;
@@ -84,6 +85,7 @@ const SOUNDS = {
 };
 
 const $ = id => document.getElementById(id);
+
 const canvas = $("game");
 const ctx = canvas.getContext("2d");
 
@@ -100,13 +102,17 @@ const doorOpenImg = new Image();
 doorOpenImg.src = DOOR_OPEN_SRC;
 
 const audio = {};
+let soundOn = localStorage.getItem("clickbaitSound") !== "off";
+
 for (const [name, src] of Object.entries(SOUNDS)) {
   audio[name] = new Audio(src);
   audio[name].preload = "auto";
 }
+
 audio.bg.loop = true;
 audio.bg.volume = 0.22;
 
+const userHud = $("userHud");
 const scoreEl = $("score");
 const bestScoreEl = $("bestScore");
 const healthEl = $("health");
@@ -115,7 +121,6 @@ const doorsHudEl = $("doorsHud");
 const timeEl = $("time");
 const bestTimeEl = $("bestTime");
 const fishHud = $("fishHud");
-const userHud = $("userHud");
 const toast = $("toast");
 const damageFlash = $("damageFlash");
 
@@ -127,6 +132,25 @@ const reviveModal = $("reviveModal");
 const learningModal = $("learningModal");
 const endModal = $("endModal");
 
+const qTitle = $("questionTitle");
+const qText = $("questionText");
+const questionTimer = $("questionTimer");
+const answers = $("answers");
+const feedback = $("feedback");
+const hintText = $("hintText");
+const hintBtn = $("hintBtn");
+
+const learningTitle = $("learningTitle");
+const learningText = $("learningText");
+
+const passwordInput = $("passwordInput");
+const passwordChecks = $("passwordChecks");
+const passwordFeedback = $("passwordFeedback");
+
+const reviveText = $("reviveText");
+const endTitle = $("endTitle");
+const endText = $("endText");
+
 const loginPanel = $("loginPanel");
 const registerPanel = $("registerPanel");
 const loginUsername = $("loginUsername");
@@ -136,22 +160,7 @@ const registerPassword = $("registerPassword");
 const authMessage = $("authMessage");
 const loggedInBox = $("loggedInBox");
 const loggedInName = $("loggedInName");
-
-const qTitle = $("questionTitle");
-const qText = $("questionText");
-const questionTimer = $("questionTimer");
-const answers = $("answers");
-const feedback = $("feedback");
-const hintText = $("hintText");
-const hintBtn = $("hintBtn");
-const learningTitle = $("learningTitle");
-const learningText = $("learningText");
-const passwordInput = $("passwordInput");
-const passwordChecks = $("passwordChecks");
-const passwordFeedback = $("passwordFeedback");
-const reviveText = $("reviveText");
-const endTitle = $("endTitle");
-const endText = $("endText");
+const soundBtn = $("soundBtn");
 
 const questions = [
   {
@@ -164,8 +173,8 @@ const questions = [
       "Reply asking if the email is legitimate"
     ],
     correct: 2,
-    hint: "Look at the sender and the urgent message. Real school alerts should be checked through official systems.",
-    lesson: "Urgent account deletion messages can be phishing. Always verify through the official school platform or a trusted staff member."
+    hint: "Check the sender and verify through the official school system.",
+    lesson: "Urgent account warnings can be phishing. Always verify through official school platforms."
   },
   {
     title: "Door 2: Free Gaming Download",
@@ -177,8 +186,8 @@ const questions = [
       "Disable antivirus and continue"
     ],
     correct: 1,
-    hint: "Unexpected downloads are risky, especially from gaming sites offering free items.",
-    lesson: "Unexpected downloads can contain malware. Delete the file and leave the site."
+    hint: "Unexpected downloads are risky.",
+    lesson: "Unknown downloads can contain malware. Delete them and leave the site."
   },
   {
     title: "Door 3: Public WiFi",
@@ -190,8 +199,8 @@ const questions = [
       "Turn brightness down before logging in"
     ],
     correct: 1,
-    hint: "Think about whether the network can be trusted.",
-    lesson: "Important accounts are safer on trusted networks. Public WiFi can expose your activity."
+    hint: "Think about whether the network is trusted.",
+    lesson: "Public WiFi can be unsafe for important accounts. Use a trusted connection."
   },
   {
     title: "Door 4: Fake Instagram Page",
@@ -203,11 +212,11 @@ const questions = [
       "It asked for your username"
     ],
     correct: 2,
-    hint: "A fake page can look real. Check the domain name.",
-    lesson: "A fake login page can copy a real design. The web address is usually the biggest warning sign."
+    hint: "A fake page can look real. Check the URL.",
+    lesson: "The web address is one of the biggest warning signs of a fake login page."
   },
   {
-    title: "Door 5: Unexpected Link Chain",
+    title: "Door 5: Unexpected Link",
     text: "A friend sends an unknown link. It requests login, then payment information. When should you stop?",
     answers: [
       "After payment request",
@@ -216,8 +225,8 @@ const questions = [
       "After account gets locked"
     ],
     correct: 2,
-    hint: "The safest point is before you interact with the suspicious link.",
-    lesson: "Stop at the unexpected link stage. Verify with the person through another trusted method."
+    hint: "The safest time to stop is before clicking.",
+    lesson: "Stop when you receive an unexpected link. Verify with the person first."
   },
   {
     title: "Door 6: Password Strength",
@@ -229,8 +238,8 @@ const questions = [
       "Neither because passwords should never contain words"
     ],
     correct: 0,
-    hint: "Length and uniqueness matter a lot.",
-    lesson: "Long unique passphrases can be strong and easier to remember than short random passwords."
+    hint: "Length and uniqueness matter.",
+    lesson: "Long unique passphrases can be strong and easier to remember."
   },
   {
     title: "Door 7: Verification Code",
@@ -242,8 +251,8 @@ const questions = [
       "Ask them to promise not to misuse it"
     ],
     correct: 2,
-    hint: "Verification codes are like keys to an account.",
-    lesson: "Never share verification codes. Even a friend account may be hacked."
+    hint: "A verification code is like an account key.",
+    lesson: "Never share verification codes. Even real-looking accounts can be hacked."
   },
   {
     title: "Door 8: QR Code Login",
@@ -255,8 +264,8 @@ const questions = [
       "HTTPS encryption"
     ],
     correct: 2,
-    hint: "HTTPS does not prove the website belongs to your school.",
-    lesson: "A website can use HTTPS and still be fake. Be careful when an unrelated site asks for credentials."
+    hint: "HTTPS does not always mean the site is trusted.",
+    lesson: "A fake website can still use HTTPS. Check if the site belongs to your school."
   },
   {
     title: "Door 9: Suspicious Link Clicked",
@@ -268,8 +277,8 @@ const questions = [
       "Factory reset device"
     ],
     correct: 2,
-    hint: "Nothing visible does not always mean nothing happened.",
-    lesson: "After clicking suspicious links, avoid entering details and monitor account activity."
+    hint: "Nothing visible does not always mean safe.",
+    lesson: "After clicking a suspicious link, avoid entering details and monitor your accounts."
   },
   {
     title: "Door 10: Shared Computer",
@@ -281,8 +290,8 @@ const questions = [
       "Save if browser looks trustworthy"
     ],
     correct: 2,
-    hint: "Shared device means other people may use it later.",
-    lesson: "Do not save passwords on shared computers. Someone else could access your account."
+    hint: "Other people may use the device later.",
+    lesson: "Never save passwords on shared computers."
   },
   {
     title: "Door 11: School Portal Email",
@@ -294,8 +303,8 @@ const questions = [
       "Reply asking whether it is legitimate"
     ],
     correct: 2,
-    hint: "Manual access avoids risky email links.",
-    lesson: "Even when an email looks correct, manually opening the portal is safer than clicking email links."
+    hint: "Manual access is safer than email links.",
+    lesson: "Open important portals manually instead of clicking email links."
   },
   {
     title: "Door 12: Delivery Message",
@@ -308,7 +317,7 @@ const questions = [
     ],
     correct: 2,
     hint: "Scammers can sometimes know real order details.",
-    lesson: "Realistic details do not prove safety. Verify delivery through the official retailer website."
+    lesson: "Realistic details do not prove safety. Verify through the official retailer site."
   },
   {
     title: "Door 13: Safe Charging",
@@ -320,8 +329,8 @@ const questions = [
       "Use whichever charges fastest"
     ],
     correct: 1,
-    hint: "USB cables can transfer data. A power socket only gives power.",
-    lesson: "A power socket avoids unknown USB data risks. Unknown charging cables can be unsafe."
+    hint: "USB cables can transfer data.",
+    lesson: "A power socket is safer than an unknown USB cable."
   },
   {
     title: "Door 14: Urgency Trick",
@@ -334,7 +343,7 @@ const questions = [
     ],
     correct: 1,
     hint: "Urgency makes people rush.",
-    lesson: "Urgency reduces careful thinking. Scammers want you to act before checking."
+    lesson: "Urgency reduces careful thinking. Scammers want fast mistakes."
   },
   {
     title: "Door 15: Spam Filter Trust",
@@ -347,39 +356,89 @@ const questions = [
     ],
     correct: 1,
     hint: "Spam filters help, but they are not perfect.",
-    lesson: "Spam filters do not catch every dangerous message. You still need to check carefully."
+    lesson: "Spam filters do not catch everything. You still need to check carefully."
   }
 ];
 
 let keys = {};
-let player, enemy, doors, coins;
-let score, health, cyberCoins, enemySpeed, fishBuffLevel, elapsed, startTime;
-let bestScore = Number(localStorage.getItem("clickbaitBestScore")) || 0;
-let bestTime = Number(localStorage.getItem("clickbaitBestTime")) || 0;
+let player;
+let enemy;
+let doors;
+let coins;
+
+let score = 0;
+let health = TOTAL_HEALTH;
+let cyberCoins = 0;
+let enemySpeed = BASE_ENEMY_SPEED;
+let fishBuffLevel = 0;
+let elapsed = 0;
+let startTime = Date.now();
+
+let bestScore = 0;
+let bestTime = 0;
 let currentUser = localStorage.getItem("clickbaitCurrentUser") || "";
-let running = false, paused = false, questionOpen = false, passwordOpen = false;
-let currentDoor = null, animationId = null, questionInterval = null, ghostTimer = null;
+
+let running = false;
+let paused = false;
+let questionOpen = false;
+let passwordOpen = false;
+
+let currentDoor = null;
+let animationId = null;
+let questionInterval = null;
+let ghostTimer = null;
+
 let questionTimeLeft = QUESTION_TIME;
-let enemyGhost = false, enemyPath = [], lastPathUpdate = 0, lastWallDamage = 0;
-let playerFacing = "right", lastDeathReason = "", enemyFrozenUntil = 0, doorCooldownUntil = 0;
-let hintsUsed = 0, questionsAnswered = 0, correctAnswers = 0, wrongAnswers = 0, finalPasswordLocked = false;
+let enemyGhost = false;
+let enemyPath = [];
+let lastPathUpdate = 0;
+let lastWallDamage = 0;
+
+let playerFacing = "right";
+let lastDeathReason = "";
+let enemyFrozenUntil = 0;
+let doorCooldownUntil = 0;
+let finalPasswordLocked = false;
+
+let hintsUsed = 0;
+let questionsAnswered = 0;
+let correctAnswers = 0;
+let wrongAnswers = 0;
 
 function playSound(name) {
-  const s = audio[name];
-  if (!s) return;
+  if (!soundOn) return;
+  const sound = audio[name];
+  if (!sound) return;
+
   try {
-    s.currentTime = 0;
-    s.play().catch(() => {});
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
   } catch {}
 }
 
 function startMusic() {
+  if (!soundOn) return;
   audio.bg.play().catch(() => {});
 }
 
 function stopMusic() {
   audio.bg.pause();
   audio.bg.currentTime = 0;
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  localStorage.setItem("clickbaitSound", soundOn ? "on" : "off");
+
+  if (soundBtn) {
+    soundBtn.textContent = soundOn ? "Sound: On" : "Sound: Off";
+  }
+
+  if (soundOn && running) {
+    startMusic();
+  } else {
+    stopMusic();
+  }
 }
 
 function clearKeys() {
@@ -413,48 +472,57 @@ function showLogin() {
 }
 
 function registerUser() {
-  const u = safeName(registerUsername.value);
-  const p = registerPassword.value;
+  const username = safeName(registerUsername.value);
+  const password = registerPassword.value;
   const users = getUsers();
 
-  if (!u || p.length < 4) {
-    authMessage.textContent = "Use a simple username and at least 4 password characters.";
+  if (!username || password.length < 4) {
+    authMessage.textContent = "Use a username and at least 4 password characters.";
     return;
   }
 
-  if (users[u]) {
-    authMessage.textContent = "This username already exists. Login instead.";
+  if (users[username]) {
+    authMessage.textContent = "Username already exists.";
     return;
   }
 
-  users[u] = {
-    password: p,
+  users[username] = {
+    password,
     bestScore: 0,
     bestTime: 0,
     gamesPlayed: 0
   };
 
   saveUsers(users);
-  loginUser(u, p);
+  loginUser(username, password);
 }
 
 function loginUser(username, password) {
-  const u = username || safeName(loginUsername.value);
-  const p = password || loginPassword.value;
+  const user = username || safeName(loginUsername.value);
+  const pass = password || loginPassword.value;
   const users = getUsers();
 
-  if (!users[u] || users[u].password !== p) {
-    authMessage.textContent = "Wrong username or password.";
+  if (!users[user]) {
+    authMessage.textContent = "Username not found.";
     return;
   }
 
-  currentUser = u;
-  localStorage.setItem("clickbaitCurrentUser", u);
-  loggedInName.textContent = u;
+  if (users[user].password !== pass) {
+    authMessage.textContent = "Wrong password.";
+    return;
+  }
+
+  currentUser = user;
+  localStorage.setItem("clickbaitCurrentUser", user);
+
+  bestScore = users[user].bestScore || 0;
+  bestTime = users[user].bestTime || 0;
+
+  loggedInName.textContent = user;
   loggedInBox.classList.remove("hidden");
-  authMessage.textContent = "Logged in successfully.";
-  bestScore = users[u].bestScore || 0;
-  bestTime = users[u].bestTime || 0;
+  authMessage.textContent = "Login successful.";
+  userHud.textContent = user;
+
   updateHud();
   playSound("click");
 }
@@ -462,8 +530,14 @@ function loginUser(username, password) {
 function logoutUser() {
   currentUser = "";
   localStorage.removeItem("clickbaitCurrentUser");
+
   loggedInBox.classList.add("hidden");
   authMessage.textContent = "Logged out.";
+  userHud.textContent = "Guest";
+
+  bestScore = 0;
+  bestTime = 0;
+
   updateHud();
 }
 
@@ -476,6 +550,22 @@ function restoreLogin() {
     bestScore = users[currentUser].bestScore || 0;
     bestTime = users[currentUser].bestTime || 0;
   }
+}
+
+function goSetupPage(page) {
+  if (page === 2) {
+    if (!$("acceptTerms").checked || !$("acceptParents").checked) {
+      $("page1Warning").textContent = "Please accept both safety rules before continuing.";
+      return;
+    }
+  }
+
+  ["setupPage1", "setupPage2", "setupPage3"].forEach(id => {
+    $(id).classList.remove("active");
+  });
+
+  $("setupPage" + page).classList.add("active");
+  playSound("click");
 }
 
 function cellCenter(cell) {
@@ -514,10 +604,10 @@ function key(c, r) {
   return `${c},${r}`;
 }
 
-function formatTime(s) {
-  const m = Math.floor(s / 60).toString().padStart(2, "0");
-  const sec = Math.floor(s % 60).toString().padStart(2, "0");
-  return `${m}:${sec}`;
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
 }
 
 function isWall(c, r) {
@@ -529,19 +619,19 @@ function nextDoor() {
 }
 
 function lockedDoorAt(c, r) {
-  const d = nextDoor();
-  return d && d.c === c && d.r === r ? d : null;
+  const door = nextDoor();
+  return door && door.c === c && door.r === r ? door : null;
 }
 
 function blockedAt(x, y, size, blockDoors = true) {
-  const pts = [
+  const points = [
     [x + 3, y + 3],
     [x + size - 3, y + 3],
     [x + 3, y + size - 3],
     [x + size - 3, y + size - 3]
   ];
 
-  for (const [px, py] of pts) {
+  for (const [px, py] of points) {
     const c = Math.floor(px / TILE);
     const r = Math.floor(py / TILE);
 
@@ -560,7 +650,7 @@ function neighbors(cell, blockDoors = false) {
     { dc: 0, dr: -1 }
   ];
 
-  const out = [];
+  const output = [];
 
   for (const d of dirs) {
     const c = cell.c + d.dc;
@@ -569,43 +659,43 @@ function neighbors(cell, blockDoors = false) {
     if (isWall(c, r)) continue;
     if (blockDoors && lockedDoorAt(c, r)) continue;
 
-    out.push({ c, r });
+    output.push({ c, r });
   }
 
-  return out;
+  return output;
 }
 
 function findPath(start, goal, blockDoors = false) {
-  const q = [start];
+  const queue = [start];
   const seen = new Set([key(start.c, start.r)]);
-  const prev = new Map();
+  const previous = new Map();
 
-  while (q.length) {
-    const cur = q.shift();
+  while (queue.length) {
+    const current = queue.shift();
 
-    if (cur.c === goal.c && cur.r === goal.r) break;
+    if (current.c === goal.c && current.r === goal.r) break;
 
-    for (const n of neighbors(cur, blockDoors)) {
-      const k = key(n.c, n.r);
+    for (const next of neighbors(current, blockDoors)) {
+      const k = key(next.c, next.r);
 
       if (seen.has(k)) continue;
 
       seen.add(k);
-      prev.set(k, cur);
-      q.push(n);
+      previous.set(k, current);
+      queue.push(next);
     }
   }
 
   if (!seen.has(key(goal.c, goal.r))) return [];
 
   const path = [];
-  let cur = goal;
+  let current = goal;
 
-  while (!(cur.c === start.c && cur.r === start.r)) {
-    path.push(cur);
-    cur = prev.get(key(cur.c, cur.r));
+  while (!(current.c === start.c && current.r === start.r)) {
+    path.push(current);
+    current = previous.get(key(current.c, current.r));
 
-    if (!cur) return [];
+    if (!current) return [];
   }
 
   path.push(start);
@@ -613,28 +703,20 @@ function findPath(start, goal, blockDoors = false) {
 }
 
 function resetState() {
-  player = {
-    x: 0,
-    y: 0,
-    size: 26
-  };
+  player = { x: 0, y: 0, size: 26 };
+  enemy = { x: 0, y: 0, size: 34 };
 
-  enemy = {
-    x: 0,
-    y: 0,
-    size: 34
-  };
-
-  doors = DOOR_CELLS.map((d, i) => ({
-    ...d,
-    id: i + 1,
+  doors = DOOR_CELLS.map((door, index) => ({
+    ...door,
+    id: index + 1,
     unlocked: false
   }));
 
-  coins = COIN_CELLS.map(c => {
-    const p = cellCenter(c);
+  coins = COIN_CELLS.map(cell => {
+    const p = cellCenter(cell);
+
     return {
-      ...c,
+      ...cell,
       x: p.x - 7,
       y: p.y - 7,
       collected: false
@@ -648,23 +730,27 @@ function resetState() {
   fishBuffLevel = 0;
   elapsed = 0;
   startTime = Date.now();
+
   running = false;
   paused = false;
   questionOpen = false;
   passwordOpen = false;
   currentDoor = null;
+
   enemyGhost = false;
   enemyPath = [];
   playerFacing = "right";
+
   lastPathUpdate = 0;
   lastWallDamage = 0;
   enemyFrozenUntil = 0;
   doorCooldownUntil = 0;
+  finalPasswordLocked = false;
+
   hintsUsed = 0;
   questionsAnswered = 0;
   correctAnswers = 0;
   wrongAnswers = 0;
-  finalPasswordLocked = false;
 
   clearKeys();
 
@@ -679,15 +765,15 @@ function resetState() {
 }
 
 function updateHud() {
+  userHud.textContent = currentUser || "Guest";
   scoreEl.textContent = score;
   bestScoreEl.textContent = bestScore;
   healthEl.textContent = health;
   cyberCoinsHud.textContent = cyberCoins;
   doorsHudEl.textContent = `${doors ? doors.filter(d => d.unlocked).length : 0}/${DOOR_CELLS.length}`;
-  timeEl.textContent = formatTime(elapsed || 0);
+  timeEl.textContent = formatTime(elapsed);
   bestTimeEl.textContent = bestTime ? formatTime(bestTime) : "--:--";
-  fishHud.textContent = `Buff ${fishBuffLevel || 0} | ${(enemySpeed || BASE_ENEMY_SPEED).toFixed(2)}${enemyGhost ? " 👻" : ""}`;
-  userHud.textContent = currentUser || "Guest";
+  fishHud.textContent = `Buff ${fishBuffLevel}${enemyGhost ? " 👻" : ""}`;
 }
 
 function drawTile(c, r, type) {
@@ -695,27 +781,21 @@ function drawTile(c, r, type) {
   const y = r * TILE;
 
   if (type === "#") {
-    const g = ctx.createLinearGradient(x, y, x + TILE, y + TILE);
-    g.addColorStop(0, "#475569");
-    g.addColorStop(0.55, "#1f2937");
-    g.addColorStop(1, "#0f172a");
-
-    ctx.fillStyle = g;
+    ctx.fillStyle = "#1e293b";
     ctx.fillRect(x, y, TILE, TILE);
 
-    ctx.strokeStyle = "rgba(226,232,240,.22)";
-    ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
+    ctx.fillStyle = "#334155";
+    ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
+
+    ctx.fillStyle = "rgba(255,255,255,0.08)";
+    ctx.fillRect(x + 7, y + 8, 14, 3);
+    ctx.fillRect(x + 21, y + 25, 11, 3);
   } else {
-    const g = ctx.createLinearGradient(x, y, x + TILE, y + TILE);
-    g.addColorStop(0, "#a1a1aa");
-    g.addColorStop(0.6, "#71717a");
-    g.addColorStop(1, "#52525b");
-
-    ctx.fillStyle = g;
+    ctx.fillStyle = "#71717a";
     ctx.fillRect(x, y, TILE, TILE);
 
-    ctx.strokeStyle = "rgba(15,23,42,.18)";
-    ctx.strokeRect(x, y, TILE, TILE);
+    ctx.fillStyle = "#52525b";
+    ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
   }
 }
 
@@ -741,56 +821,55 @@ function drawCoins() {
     if (coin.collected) continue;
 
     ctx.fillStyle = "#fde68a";
-    ctx.beginPath();
-    ctx.arc(coin.x + 7, coin.y + 7, 7, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(coin.x + 2, coin.y, 10, 14);
 
     ctx.fillStyle = "#f59e0b";
-    ctx.beginPath();
-    ctx.arc(coin.x + 7, coin.y + 7, 4, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(coin.x + 4, coin.y + 3, 6, 8);
   }
 }
 
 function drawDoors() {
   if (!doors) return;
 
-  const active = nextDoor();
+  const activeDoor = nextDoor();
 
-  for (const d of doors) {
-    if (!d.unlocked && (!active || d.id !== active.id)) continue;
+  for (const door of doors) {
+    if (!door.unlocked && (!activeDoor || door.id !== activeDoor.id)) continue;
 
-    const p = cellCenter(d);
-    const img = d.unlocked ? doorOpenImg : doorClosedImg;
+    const p = cellCenter(door);
+    const img = door.unlocked ? doorOpenImg : doorClosedImg;
 
     if (img.complete && img.naturalWidth > 0) {
       ctx.drawImage(img, p.x - 20, p.y - 34, 40, 56);
     } else {
-      ctx.fillStyle = d.unlocked ? "#22c55e" : "#facc15";
+      ctx.fillStyle = door.unlocked ? "#22c55e" : "#facc15";
       ctx.fillRect(p.x - 16, p.y - 26, 32, 42);
     }
 
-    ctx.fillStyle = "rgba(15,23,42,.92)";
-    ctx.fillRect(p.x - 30, p.y - 62, 62, 18);
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(p.x - 31, p.y - 62, 64, 18);
 
-    ctx.strokeStyle = "#475569";
-    ctx.strokeRect(p.x - 30, p.y - 62, 62, 18);
+    ctx.strokeStyle = "#67e8f9";
+    ctx.strokeRect(p.x - 31, p.y - 62, 64, 18);
 
     ctx.fillStyle = "#e0f2fe";
-    ctx.font = "bold 11px Arial";
-    ctx.fillText(d.final ? "Final" : `Door ${d.id}`, p.x - 22, p.y - 49);
+    ctx.font = "10px Courier New";
+    ctx.fillText(door.final ? "FINAL" : `DOOR ${door.id}`, p.x - 24, p.y - 49);
   }
 }
 
 function drawExit() {
   const ep = cellCenter(EXIT);
 
-  ctx.fillStyle = "rgba(15,23,42,.92)";
-  ctx.fillRect(ep.x - 22, ep.y - 28, 44, 22);
+  ctx.fillStyle = "#020617";
+  ctx.fillRect(ep.x - 24, ep.y - 28, 48, 24);
+
+  ctx.strokeStyle = "#67e8f9";
+  ctx.strokeRect(ep.x - 24, ep.y - 28, 48, 24);
 
   ctx.fillStyle = "#67e8f9";
-  ctx.font = "bold 12px Arial";
-  ctx.fillText("EXIT", ep.x - 14, ep.y - 13);
+  ctx.font = "bold 12px Courier New";
+  ctx.fillText("EXIT", ep.x - 14, ep.y - 12);
 }
 
 function drawPlayer() {
@@ -811,9 +890,7 @@ function drawPlayer() {
     }
   } else {
     ctx.fillStyle = "#22c55e";
-    ctx.beginPath();
-    ctx.arc(player.x + 13, player.y + 13, 12, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(player.x + 5, player.y + 4, 18, 22);
   }
 
   ctx.restore();
@@ -836,17 +913,15 @@ function drawEnemy() {
   if (fishImg.complete && fishImg.naturalWidth > 0) {
     ctx.drawImage(fishImg, enemy.x - offset, enemy.y - offset, drawSize, drawSize);
   } else {
-    ctx.fillStyle = enemyGhost ? "purple" : "red";
-    ctx.beginPath();
-    ctx.arc(enemy.x + 17, enemy.y + 17, 17 + buffSize / 2, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillStyle = enemyGhost ? "#a855f7" : "#ef4444";
+    ctx.fillRect(enemy.x, enemy.y, drawSize, drawSize);
   }
 
   ctx.restore();
 }
 
 function drawVignette() {
-  const v = ctx.createRadialGradient(
+  const gradient = ctx.createRadialGradient(
     canvas.width / 2,
     canvas.height / 2,
     180,
@@ -855,10 +930,10 @@ function drawVignette() {
     700
   );
 
-  v.addColorStop(0, "rgba(0,0,0,0)");
-  v.addColorStop(1, "rgba(0,0,0,.42)");
+  gradient.addColorStop(0, "rgba(0,0,0,0)");
+  gradient.addColorStop(1, "rgba(0,0,0,.45)");
 
-  ctx.fillStyle = v;
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -931,19 +1006,21 @@ function movePlayer() {
 function checkDoor() {
   if (Date.now() < doorCooldownUntil) return;
 
-  const d = nextDoor();
+  const door = nextDoor();
 
-  if (!d || questionOpen || passwordOpen || paused) return;
+  if (!door || questionOpen || passwordOpen || paused) return;
 
-  if (dist(center(player, player.size), cellCenter(d)) < TILE * 1.15) {
-    d.final ? openPasswordDoor(d) : openQuestion(d);
+  const isNear = dist(center(player, player.size), cellCenter(door)) < TILE * 1.15;
+
+  if (isNear) {
+    door.final ? openPasswordDoor(door) : openQuestion(door);
   }
 }
 
-function openQuestion(d) {
+function openQuestion(door) {
   clearKeys();
 
-  currentDoor = d;
+  currentDoor = door;
   questionOpen = true;
   running = false;
 
@@ -955,27 +1032,27 @@ function openQuestion(d) {
   hintText.textContent = "";
   answers.innerHTML = "";
 
-  const q = questions[d.id - 1];
+  const question = questions[door.id - 1];
 
-  qTitle.textContent = q.title;
-  qText.textContent = q.text;
+  qTitle.textContent = question.title;
+  qText.textContent = question.text;
   hintBtn.disabled = false;
-  hintBtn.textContent = `Use Hint (${HINT_COST} Cyber Coin)`;
+  hintBtn.textContent = `Use Hint (${HINT_COST} Coin)`;
 
-  toast.textContent = `Door ${d.id} question opened.`;
+  toast.textContent = `Door ${door.id} challenge opened.`;
   playSound("click");
 
-  q.answers.forEach((a, i) => {
-    const b = document.createElement("button");
-    b.textContent = `${String.fromCharCode(65 + i)}) ${a}`;
-    b.onclick = () => answerQuestion(i, q, false);
-    answers.appendChild(b);
+  question.answers.forEach((answer, index) => {
+    const button = document.createElement("button");
+    button.textContent = `${String.fromCharCode(65 + index)}) ${answer}`;
+    button.onclick = () => answerQuestion(index, question, false);
+    answers.appendChild(button);
   });
 
-  startQuestionTimer(q);
+  startQuestionTimer(question);
 }
 
-function startQuestionTimer(q) {
+function startQuestionTimer(question) {
   if (questionInterval) clearInterval(questionInterval);
 
   questionTimeLeft = QUESTION_TIME;
@@ -990,7 +1067,7 @@ function startQuestionTimer(q) {
     if (questionTimeLeft <= 0) {
       clearInterval(questionInterval);
       questionInterval = null;
-      answerQuestion(-1, q, true);
+      answerQuestion(-1, question, true);
     }
   }, 1000);
 }
@@ -998,26 +1075,28 @@ function startQuestionTimer(q) {
 function useHint() {
   if (!questionOpen || !currentDoor) return;
 
-  const q = questions[currentDoor.id - 1];
+  const question = questions[currentDoor.id - 1];
 
   if (cyberCoins < HINT_COST) {
-    hintText.textContent = "Not enough Cyber Coins for a hint.";
+    hintText.textContent = "Not enough Cyber Coins.";
     return;
   }
 
   cyberCoins -= HINT_COST;
   hintsUsed++;
-  hintText.textContent = `Hint: ${q.hint}`;
+
+  hintText.textContent = `Hint: ${question.hint}`;
   hintBtn.disabled = true;
+
   updateHud();
   playSound("hint");
 }
 
-function answerQuestion(selected, q, timedOut) {
+function answerQuestion(selected, question, timedOut) {
   if (!questionOpen) return;
 
-  answers.querySelectorAll("button").forEach(b => {
-    b.disabled = true;
+  answers.querySelectorAll("button").forEach(button => {
+    button.disabled = true;
   });
 
   if (questionInterval) clearInterval(questionInterval);
@@ -1025,23 +1104,24 @@ function answerQuestion(selected, q, timedOut) {
 
   questionsAnswered++;
 
-  const good = !timedOut && selected === q.correct;
+  const correct = !timedOut && selected === question.correct;
 
-  if (good) {
+  if (correct) {
     correctAnswers++;
     score += 20;
     cyberCoins++;
     currentDoor.unlocked = true;
 
-    feedback.textContent = "+20 points and +1 Cyber Coin.";
+    feedback.textContent = "+20 score and +1 Cyber Coin.";
     toast.textContent = `Door ${currentDoor.id} unlocked. Next door revealed.`;
 
     playSound("correct");
     playSound("unlock");
+
     updateHud();
     draw();
 
-    showLearning("Correct", q.lesson, true);
+    showLearning("Correct!", question.lesson, true);
   } else {
     wrongAnswers++;
     score = Math.max(0, score - 10);
@@ -1054,28 +1134,32 @@ function answerQuestion(selected, q, timedOut) {
     feedback.textContent = timedOut ? "Time up. Fish buff activated." : "Wrong answer. Fish buff activated.";
 
     playSound("wrong");
+
     updateHud();
     draw();
 
-    showLearning(timedOut ? "Time Up" : "Wrong Answer", q.lesson, false);
+    showLearning(timedOut ? "Time Up" : "Wrong Answer", question.lesson, false);
   }
 }
 
 function showLearning(title, text, correct) {
   learningTitle.textContent = title;
   learningText.textContent = text;
+
   learningModal.classList.add("active");
 
   setTimeout(() => {
     learningModal.classList.remove("active");
     closeQuestionAndResume();
-  }, correct ? 1600 : 1300);
+  }, correct ? 1500 : 1300);
 }
 
 function closeQuestionAndResume() {
   qModal.classList.remove("active");
+
   questionOpen = false;
   currentDoor = null;
+
   clearKeys();
   resumeGame(false);
 }
@@ -1099,10 +1183,10 @@ function buffFish() {
   }, 6000);
 }
 
-function openPasswordDoor(d) {
+function openPasswordDoor(door) {
   clearKeys();
 
-  currentDoor = d;
+  currentDoor = door;
   passwordOpen = true;
   running = false;
 
@@ -1114,28 +1198,28 @@ function openPasswordDoor(d) {
   updatePasswordChecks();
 
   passwordModal.classList.add("active");
-  playSound("lock");
 
-  toast.textContent = "Final door: create a strong password to lock the fish behind you.";
+  playSound("lock");
+  toast.textContent = "Final door: create a strong password to lock the fish out.";
 }
 
 function updatePasswordChecks() {
-  const p = passwordInput.value;
+  const password = passwordInput.value;
 
   const checks = [
-    { ok: p.length >= 12, t: "At least 12 characters" },
-    { ok: /[A-Z]/.test(p), t: "One uppercase letter" },
-    { ok: /[a-z]/.test(p), t: "One lowercase letter" },
-    { ok: /[0-9]/.test(p), t: "One number" },
-    { ok: /[^A-Za-z0-9]/.test(p), t: "One symbol" },
-    { ok: !p.toLowerCase().includes("password"), t: "Does not use the word password" }
+    { ok: password.length >= 12, text: "At least 12 characters" },
+    { ok: /[A-Z]/.test(password), text: "One uppercase letter" },
+    { ok: /[a-z]/.test(password), text: "One lowercase letter" },
+    { ok: /[0-9]/.test(password), text: "One number" },
+    { ok: /[^A-Za-z0-9]/.test(password), text: "One symbol" },
+    { ok: !password.toLowerCase().includes("password"), text: "Does not use the word password" }
   ];
 
   passwordChecks.innerHTML = checks
-    .map(c => `<li class="${c.ok ? "ok" : "bad"}">${c.ok ? "✅" : "❌"} ${c.t}</li>`)
+    .map(check => `<li class="${check.ok ? "ok" : "bad"}">${check.ok ? "✅" : "❌"} ${check.text}</li>`)
     .join("");
 
-  return checks.every(c => c.ok);
+  return checks.every(check => check.ok);
 }
 
 function submitPasswordDoor() {
@@ -1145,16 +1229,18 @@ function submitPasswordDoor() {
     score += 30;
     cyberCoins++;
     currentDoor.unlocked = true;
+
     finalPasswordLocked = true;
     enemyFrozenUntil = Date.now() + 999999;
     enemyGhost = false;
     enemyPath = [];
 
-    passwordFeedback.textContent = "Strong password. Final door locked behind you. The fish cannot follow now.";
+    passwordFeedback.textContent = "Strong password. Door locked. The fish cannot follow.";
     toast.textContent = "Final door secured. Run to EXIT!";
 
     playSound("lock");
     playSound("open");
+
     updateHud();
     draw();
 
@@ -1169,7 +1255,6 @@ function submitPasswordDoor() {
     score = Math.max(0, score - 10);
 
     buffFish();
-
     setToCell(player, currentDoor.spawn, player.size);
     doorCooldownUntil = Date.now() + 1600;
 
@@ -1191,12 +1276,12 @@ function submitPasswordDoor() {
 function moveEnemy() {
   if (Date.now() < enemyFrozenUntil || finalPasswordLocked) return;
 
-  const ec = center(enemy, enemy.size);
-  const pc = center(player, player.size);
+  const enemyCenter = center(enemy, enemy.size);
+  const playerCenter = center(player, player.size);
 
   if (enemyGhost) {
-    const dx = pc.x - ec.x;
-    const dy = pc.y - ec.y;
+    const dx = playerCenter.x - enemyCenter.x;
+    const dy = playerCenter.y - enemyCenter.y;
     const d = Math.hypot(dx, dy);
 
     if (d > 0) {
@@ -1217,8 +1302,8 @@ function moveEnemy() {
   if (!enemyPath || enemyPath.length < 2) return;
 
   const target = cellCenter(enemyPath[1]);
-  const dx = target.x - ec.x;
-  const dy = target.y - ec.y;
+  const dx = target.x - enemyCenter.x;
+  const dy = target.y - enemyCenter.y;
   const d = Math.hypot(dx, dy);
 
   if (d < 2) {
@@ -1231,10 +1316,10 @@ function moveEnemy() {
 }
 
 function checkCoins() {
-  const pc = center(player, player.size);
+  const playerCenter = center(player, player.size);
 
   for (const coin of coins) {
-    if (!coin.collected && dist(pc, { x: coin.x + 7, y: coin.y + 7 }) < 20) {
+    if (!coin.collected && dist(playerCenter, { x: coin.x + 7, y: coin.y + 7 }) < 20) {
       coin.collected = true;
       score += 5;
       playSound("bonus");
@@ -1254,14 +1339,35 @@ function checkCaught() {
 }
 
 function checkWin() {
-  if (doors.every(d => d.unlocked) && dist(center(player, player.size), cellCenter(EXIT)) < 30) {
+  if (doors.every(door => door.unlocked) && dist(center(player, player.size), cellCenter(EXIT)) < 30) {
     endGame(true);
   }
 }
 
-function getRespawnCell() {
-  const unlocked = doors.filter(d => d.unlocked);
-  return unlocked.length ? unlocked[unlocked.length - 1].spawn : START;
+function getProgressDoorNumber() {
+  const active = nextDoor();
+
+  if (active) return active.id;
+
+  return DOOR_CELLS.length;
+}
+
+function getEnemyReviveCell() {
+  const progressDoor = getProgressDoorNumber();
+  const targetDoorNumber = Math.max(1, progressDoor - 2);
+  const targetDoor = doors[targetDoorNumber - 1];
+
+  if (!targetDoor) return START;
+
+  return targetDoor.spawn || START;
+}
+
+function getPlayerRespawnCell() {
+  const unlocked = doors.filter(door => door.unlocked);
+
+  if (!unlocked.length) return START;
+
+  return unlocked[unlocked.length - 1].spawn || START;
 }
 
 function handlePlayerDeath(reason) {
@@ -1278,7 +1384,9 @@ function handlePlayerDeath(reason) {
     reviveText.innerHTML = `
       ${reason}<br><br>
       You have <strong>${cyberCoins}</strong> Cyber Coins.<br>
-      Spend <strong>${REVIVE_COST}</strong> to revive with full health?
+      Spend <strong>${REVIVE_COST}</strong> Cyber Coins to revive with full health?
+      <br><br>
+      The fish will respawn two doors behind your current progress.
     `;
 
     reviveModal.classList.add("active");
@@ -1294,8 +1402,8 @@ function useRevive() {
   cyberCoins -= REVIVE_COST;
   health = TOTAL_HEALTH;
 
-  setToCell(player, getRespawnCell(), player.size);
-  setToCell(enemy, { c: 1, r: 1 }, enemy.size);
+  setToCell(player, getPlayerRespawnCell(), player.size);
+  setToCell(enemy, getEnemyReviveCell(), enemy.size);
 
   enemyPath = [];
   enemyGhost = false;
@@ -1303,7 +1411,7 @@ function useRevive() {
 
   clearKeys();
 
-  toast.textContent = `Revived using ${REVIVE_COST} Cyber Coins. Full health restored.`;
+  toast.textContent = `Revived. Full health restored. Fish respawned 2 doors behind.`;
 
   playSound("bonus");
   updateHud();
@@ -1318,40 +1426,46 @@ function refuseRevive() {
 }
 
 function saveRecords() {
-  const rec = {
+  const record = {
     newScore: false,
     newTime: false
   };
 
   if (score > bestScore) {
     bestScore = score;
-    localStorage.setItem("clickbaitBestScore", String(bestScore));
-    rec.newScore = true;
+    record.newScore = true;
   }
 
   if (!bestTime || elapsed < bestTime) {
     bestTime = elapsed;
-    localStorage.setItem("clickbaitBestTime", String(bestTime));
-    rec.newTime = true;
+    record.newTime = true;
   }
 
   if (currentUser) {
     const users = getUsers();
 
     if (users[currentUser]) {
-      users[currentUser].bestScore = Math.max(users[currentUser].bestScore || 0, score);
+      users[currentUser].bestScore = Math.max(users[currentUser].bestScore || 0, bestScore);
       users[currentUser].bestTime = !users[currentUser].bestTime
-        ? elapsed
-        : Math.min(users[currentUser].bestTime, elapsed);
+        ? bestTime
+        : Math.min(users[currentUser].bestTime, bestTime);
       users[currentUser].gamesPlayed = (users[currentUser].gamesPlayed || 0) + 1;
+
       saveUsers(users);
     }
   }
 
-  return rec;
+  return record;
 }
 
-function endGame(won, msg) {
+function getBadge() {
+  if (correctAnswers >= 14) return "🏆 Cyber Expert";
+  if (correctAnswers >= 11) return "🥈 Cyber Defender";
+  if (correctAnswers >= 8) return "🥉 Cyber Learner";
+  return "🛡️ Cyber Beginner";
+}
+
+function endGame(won, message) {
   clearKeys();
 
   running = false;
@@ -1362,7 +1476,7 @@ function endGame(won, msg) {
   stopMusic();
 
   if (won) {
-    const rec = saveRecords();
+    const record = saveRecords();
     updateHud();
 
     endTitle.textContent = "Final Result";
@@ -1371,22 +1485,19 @@ function endGame(won, msg) {
     endText.innerHTML = `
       <div class="result-grid">
         <div>Player</div><strong>${currentUser || "Guest"}</strong>
-        <div>Final Score</div><strong>${score}${rec.newScore ? " ⭐ New Best" : ""}</strong>
+        <div>Final Score</div><strong>${score}${record.newScore ? " ⭐ New Best" : ""}</strong>
         <div>Best Score</div><strong>${bestScore}</strong>
-        <div>Time</div><strong>${formatTime(elapsed)}${rec.newTime ? " ⭐ New Best" : ""}</strong>
+        <div>Time</div><strong>${formatTime(elapsed)}${record.newTime ? " ⭐ New Best" : ""}</strong>
         <div>Best Time</div><strong>${bestTime ? formatTime(bestTime) : "--:--"}</strong>
         <div>Correct Answers</div><strong>${correctAnswers}/${questionsAnswered}</strong>
         <div>Hints Used</div><strong>${hintsUsed}</strong>
         <div>Cyber Coins Left</div><strong>${cyberCoins}</strong>
         <div>Fish Buff Level</div><strong>${fishBuffLevel}</strong>
+        <div>Badge</div><strong>${getBadge()}</strong>
       </div>
-      <p><strong>Cyber Badge:</strong> ${
-        correctAnswers >= 13
-          ? "🏆 Cyber Expert"
-          : correctAnswers >= 10
-            ? "🥈 Cyber Defender"
-            : "🥉 Cyber Learner"
-      }</p>
+      <p class="small-text">
+        Cyber lesson: Think before clicking, check links, protect passwords, and never share verification codes.
+      </p>
     `;
   } else {
     endTitle.textContent = "Game Over";
@@ -1394,17 +1505,20 @@ function endGame(won, msg) {
     playSound("overVoice");
 
     endText.innerHTML = `
-      ${msg || "Game over."}<br><br>
+      <p>${message || "Game over."}</p>
       <div class="result-grid">
         <div>Player</div><strong>${currentUser || "Guest"}</strong>
         <div>Final Score</div><strong>${score}</strong>
         <div>Best Score</div><strong>${bestScore}</strong>
         <div>Time</div><strong>${formatTime(elapsed)}</strong>
         <div>Best Time</div><strong>${bestTime ? formatTime(bestTime) : "--:--"}</strong>
-        <div>Doors Completed</div><strong>${doors.filter(d => d.unlocked).length}/${doors.length}</strong>
+        <div>Doors Completed</div><strong>${doors.filter(door => door.unlocked).length}/${doors.length}</strong>
         <div>Correct Answers</div><strong>${correctAnswers}/${questionsAnswered}</strong>
         <div>Hints Used</div><strong>${hintsUsed}</strong>
       </div>
+      <p class="small-text">
+        Cyber lesson: Slow down and check before clicking. Scammers use pressure to make you rush.
+      </p>
     `;
   }
 
@@ -1431,22 +1545,20 @@ function loop() {
   animationId = requestAnimationFrame(loop);
 }
 
-function allAccepted() {
-  return $("acceptHow").checked && $("acceptParents").checked && $("acceptTerms").checked;
-}
-
 function startGame() {
   if (!currentUser) {
     authMessage.textContent = "Please login or register before starting.";
     return;
   }
 
-  if (!allAccepted()) {
-    $("agreeWarning").textContent = "Please manually accept How to Play, Parental Controls, and Terms.";
+  if (!$("acceptTerms").checked || !$("acceptParents").checked) {
+    goSetupPage(1);
+    $("page1Warning").textContent = "Please accept the rules before starting.";
     return;
   }
 
   playSound("click");
+
   startModal.classList.remove("active");
 
   resetState();
@@ -1455,7 +1567,7 @@ function startGame() {
   paused = false;
   startTime = Date.now();
 
-  toast.textContent = "Only the next door is shown. Answer carefully.";
+  toast.textContent = "Only the next door is shown. Answer carefully and survive.";
 
   startMusic();
   loop();
@@ -1471,6 +1583,10 @@ function pauseGame() {
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
+
+  if (soundBtn) {
+    soundBtn.textContent = soundOn ? "Sound: On" : "Sound: Off";
+  }
 
   pauseModal.classList.add("active");
   playSound("click");
@@ -1496,6 +1612,8 @@ function resumeGame(closePause = true) {
   running = true;
   startTime = Date.now() - elapsed * 1000;
 
+  startMusic();
+
   if (!animationId) {
     loop();
   }
@@ -1503,14 +1621,13 @@ function resumeGame(closePause = true) {
 
 function restartGame() {
   [
-    startModal,
     pauseModal,
     qModal,
     passwordModal,
     reviveModal,
     learningModal,
     endModal
-  ].forEach(m => m.classList.remove("active"));
+  ].forEach(modal => modal.classList.remove("active"));
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1526,23 +1643,37 @@ function restartGame() {
   loop();
 }
 
-function showIntroTab(type) {
-  ["how", "parents", "terms"].forEach(t => {
-    $("intro-" + t).classList.remove("active");
-  });
+function exitGame() {
+  [
+    pauseModal,
+    qModal,
+    passwordModal,
+    reviveModal,
+    learningModal,
+    endModal
+  ].forEach(modal => modal.classList.remove("active"));
 
-  $("intro-" + type).classList.add("active");
-  playSound("click");
+  if (animationId) cancelAnimationFrame(animationId);
+  animationId = null;
+
+  stopMusic();
+  clearKeys();
+  resetState();
+
+  startModal.classList.add("active");
+  goSetupPage(3);
+
+  toast.textContent = "Exited game safely. You can start again from the menu.";
 }
 
-document.addEventListener("keydown", e => {
-  const k = e.key.toLowerCase();
+document.addEventListener("keydown", event => {
+  const keyPressed = event.key.toLowerCase();
 
-  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(k)) {
-    e.preventDefault();
+  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(keyPressed)) {
+    event.preventDefault();
   }
 
-  if (k === "escape") {
+  if (keyPressed === "escape") {
     paused ? resumeGame(true) : pauseGame();
     return;
   }
@@ -1554,12 +1685,12 @@ document.addEventListener("keydown", e => {
     !reviveModal.classList.contains("active") &&
     !startModal.classList.contains("active")
   ) {
-    keys[k] = true;
+    keys[keyPressed] = true;
   }
 });
 
-document.addEventListener("keyup", e => {
-  keys[e.key.toLowerCase()] = false;
+document.addEventListener("keyup", event => {
+  keys[event.key.toLowerCase()] = false;
 });
 
 window.addEventListener("blur", clearKeys);
@@ -1577,3 +1708,7 @@ fishImg.onload = draw;
 playerImg.onload = draw;
 doorClosedImg.onload = draw;
 doorOpenImg.onload = draw;
+
+if (soundBtn) {
+  soundBtn.textContent = soundOn ? "Sound: On" : "Sound: Off";
+}
