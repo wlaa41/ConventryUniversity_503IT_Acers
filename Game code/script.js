@@ -63,7 +63,7 @@ const COIN_CELLS = [
 ];
 
 const FISH_SRC = "assets/enemy-fish.png";
-const PLAYER_SRC = "assets/player.png";
+const PLAYER_SRC = "assets/player-animated.gif";
 const DOOR_CLOSED_SRC = "assets/door-closed.png";
 const DOOR_OPEN_SRC = "assets/door-open.png";
 
@@ -126,6 +126,9 @@ const toast = $("toast");
 const damageFlash = $("damageFlash");
 
 const startModal = $("startModal");
+const loadingModal = $("loadingModal");
+const loadingFill = $("loadingFill");
+const loadingText = $("loadingText");
 const pauseModal = $("pauseModal");
 const qModal = $("questionModal");
 const passwordModal = $("passwordModal");
@@ -145,6 +148,7 @@ const learningTitle = $("learningTitle");
 const learningText = $("learningText");
 
 const passwordInput = $("passwordInput");
+const passwordConfirmInput = $("passwordConfirmInput");
 const passwordChecks = $("passwordChecks");
 const passwordFeedback = $("passwordFeedback");
 
@@ -1238,16 +1242,17 @@ function openPasswordDoor(door) {
   animationId = null;
 
   passwordInput.value = "";
+  passwordConfirmInput.value = "";
   passwordFeedback.textContent = "";
   updatePasswordChecks();
 
   passwordModal.classList.add("active");
 
   playSound("lock");
-  toast.textContent = "Final door: type any password. The door opens only if it is strong.";
+  toast.textContent = "Final door: create and confirm a strong password to lock the fish out.";
 }
 
-function getPasswordIssues(password) {
+function getPasswordIssues(password, confirmPassword = "") {
   const issues = [];
 
   if (password.length < 8) {
@@ -1270,33 +1275,39 @@ function getPasswordIssues(password) {
     issues.push("Add one special character.");
   }
 
+  if (password !== confirmPassword) {
+    issues.push("Passwords do not match.");
+  }
+
   return issues;
 }
 
 function updatePasswordChecks() {
   const password = passwordInput.value;
-  const issues = getPasswordIssues(password);
+  const confirmPassword = passwordConfirmInput.value;
 
   const checks = [
     { ok: password.length >= 8, text: "At least 8 characters" },
     { ok: /[A-Z]/.test(password), text: "One uppercase letter" },
     { ok: /[a-z]/.test(password), text: "One lowercase letter" },
     { ok: /[0-9]/.test(password), text: "One number" },
-    { ok: /[^A-Za-z0-9]/.test(password), text: "One special character" }
+    { ok: /[^A-Za-z0-9]/.test(password), text: "One special character" },
+    { ok: password.length > 0 && password === confirmPassword, text: "Passwords match" }
   ];
 
   passwordChecks.innerHTML = checks
     .map(check => `<li class="${check.ok ? "ok" : "bad"}">${check.ok ? "✅" : "❌"} ${check.text}</li>`)
     .join("");
 
-  return issues.length === 0;
+  return checks.every(check => check.ok);
 }
 
 function submitPasswordDoor() {
   if (!passwordOpen) return;
 
   const password = passwordInput.value;
-  const issues = getPasswordIssues(password);
+  const confirmPassword = passwordConfirmInput.value;
+  const issues = getPasswordIssues(password, confirmPassword);
 
   if (issues.length > 0) {
     passwordFeedback.innerHTML = `
@@ -1320,7 +1331,7 @@ function submitPasswordDoor() {
   enemyGhost = false;
   enemyPath = [];
 
-  passwordFeedback.textContent = "Strong password. Final door unlocked. The fish cannot follow you.";
+  passwordFeedback.textContent = "Strong password confirmed. Final door unlocked. The fish cannot follow you.";
   toast.textContent = "Strong passwords protect accounts. Run to EXIT and lock the fish out!";
 
   playSound("lock");
@@ -1658,7 +1669,37 @@ function startGame() {
   playSound("click");
 
   startModal.classList.remove("active");
+  loadingModal.classList.add("active");
 
+  loadingFill.style.width = "0%";
+  loadingText.textContent = "Preparing doors...";
+
+  let progress = 0;
+
+  const loadingSteps = [
+    "Preparing doors...",
+    "Loading cyber questions...",
+    "Starting fish AI...",
+    "Checking password door...",
+    "Entering maze..."
+  ];
+
+  const loadInterval = setInterval(() => {
+    progress += 20;
+    loadingFill.style.width = progress + "%";
+
+    const stepIndex = Math.min(Math.floor(progress / 20) - 1, loadingSteps.length - 1);
+    loadingText.textContent = loadingSteps[Math.max(0, stepIndex)];
+
+    if (progress >= 100) {
+      clearInterval(loadInterval);
+      loadingModal.classList.remove("active");
+      beginGame();
+    }
+  }, 350);
+}
+
+function beginGame() {
   resetState();
 
   running = true;
@@ -1727,7 +1768,8 @@ function restartGame() {
     passwordModal,
     reviveModal,
     learningModal,
-    endModal
+    endModal,
+    loadingModal
   ].forEach(modal => modal.classList.remove("active"));
 
   if (animationId) cancelAnimationFrame(animationId);
@@ -1754,7 +1796,8 @@ function exitGame() {
     passwordModal,
     reviveModal,
     learningModal,
-    endModal
+    endModal,
+    loadingModal
   ].forEach(modal => modal.classList.remove("active"));
 
   if (animationId) cancelAnimationFrame(animationId);
@@ -1788,7 +1831,8 @@ document.addEventListener("keydown", event => {
     !passwordOpen &&
     !paused &&
     !reviveModal.classList.contains("active") &&
-    !startModal.classList.contains("active")
+    !startModal.classList.contains("active") &&
+    !loadingModal.classList.contains("active")
   ) {
     keys[keyPressed] = true;
   }
@@ -1805,6 +1849,7 @@ window.addEventListener("visibilitychange", () => {
 });
 
 passwordInput.addEventListener("input", updatePasswordChecks);
+passwordConfirmInput.addEventListener("input", updatePasswordChecks);
 
 restoreLogin();
 resetState();
