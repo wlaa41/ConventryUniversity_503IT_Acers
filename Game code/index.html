@@ -33,11 +33,9 @@
     <canvas id="game" width="1160" height="680"></canvas>
     <div id="damageFlash"></div>
 
-    <!-- START / SETUP SCREEN -->
     <div id="startModal" class="modal active">
       <div class="modal-card intro-card">
 
-        <!-- PAGE 1 -->
         <div id="setupPage1" class="setup-page active">
           <h2>Before You Play</h2>
           <p class="small-text">
@@ -78,7 +76,6 @@
           <button class="restart-btn" onclick="goSetupPage(2)">Continue</button>
         </div>
 
-        <!-- PAGE 2 -->
         <div id="setupPage2" class="setup-page">
           <h2>How to Play + Cyber Tips</h2>
 
@@ -93,6 +90,7 @@
                 <li>Correct answers give score and Cyber Coins.</li>
                 <li>Hints cost 1 Cyber Coin.</li>
                 <li>3 Cyber Coins can revive you with full health.</li>
+                <li>You can revive maximum 2 times.</li>
                 <li>The final door needs a strong password.</li>
               </ul>
             </div>
@@ -116,7 +114,6 @@
           </div>
         </div>
 
-        <!-- PAGE 3 -->
         <div id="setupPage3" class="setup-page">
           <h2>Login & Start</h2>
 
@@ -161,7 +158,6 @@
       </div>
     </div>
 
-    <!-- PAUSE -->
     <div id="pauseModal" class="modal">
       <div class="modal-card">
         <h2>Paused</h2>
@@ -175,7 +171,6 @@
       </div>
     </div>
 
-    <!-- QUESTION -->
     <div id="questionModal" class="modal">
       <div class="modal-card question-card">
         <div class="question-head">
@@ -190,29 +185,27 @@
       </div>
     </div>
 
-    <!-- LEARNING -->
     <div id="learningModal" class="modal">
       <div class="modal-card learning-card">
         <h2 id="learningTitle">Learning Point</h2>
         <p id="learningText" class="small-text"></p>
+        <button class="restart-btn continue-btn" onclick="continueLearning()">Continue</button>
       </div>
     </div>
 
-    <!-- FINAL PASSWORD -->
     <div id="passwordModal" class="modal">
       <div class="modal-card">
         <h2>Final Door: Lock the Fish Out</h2>
         <p class="small-text">
-          Create a strong password. If it is strong, the final door locks behind you and the fish cannot follow.
+          Type any password first. The door will only open if the password is strong enough.
         </p>
         <input id="passwordInput" class="password-input" type="text" placeholder="Create a strong password">
         <ul id="passwordChecks" class="password-checks"></ul>
         <p id="passwordFeedback"></p>
-        <button class="restart-btn" onclick="submitPasswordDoor()">Lock Final Door</button>
+        <button class="restart-btn" onclick="submitPasswordDoor()">Check Password</button>
       </div>
     </div>
 
-    <!-- REVIVE -->
     <div id="reviveModal" class="modal">
       <div class="modal-card">
         <h2>Revive Available</h2>
@@ -224,7 +217,6 @@
       </div>
     </div>
 
-    <!-- END -->
     <div id="endModal" class="modal">
       <div class="modal-card">
         <h2 id="endTitle">Final Result</h2>
@@ -246,4 +238,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
