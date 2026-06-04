@@ -33,9 +33,11 @@
     <canvas id="game" width="1160" height="680"></canvas>
     <div id="damageFlash"></div>
 
+    <!-- START / SETUP SCREEN -->
     <div id="startModal" class="modal active">
       <div class="modal-card intro-card">
 
+        <!-- PAGE 1 -->
         <div id="setupPage1" class="setup-page active">
           <h2>Before You Play</h2>
           <p class="small-text">
@@ -76,8 +78,9 @@
           <button class="restart-btn" onclick="goSetupPage(2)">Continue</button>
         </div>
 
+        <!-- PAGE 2 -->
         <div id="setupPage2" class="setup-page">
-          <h2>How to Play + Cyber Tips</h2>
+          <h2>How to Play + Game Rules</h2>
 
           <div class="panel-grid">
             <div class="info-panel">
@@ -85,16 +88,31 @@
               <ul>
                 <li>Move using WASD or Arrow Keys.</li>
                 <li>Pause using ESC.</li>
-                <li>Only the next door is shown.</li>
+                <li>Only the next locked door is shown.</li>
                 <li>Answer cyber questions to unlock doors.</li>
                 <li>Correct answers give score and Cyber Coins.</li>
                 <li>Hints cost 1 Cyber Coin.</li>
-                <li>3 Cyber Coins can revive you with full health.</li>
-                <li>You can revive maximum 2 times.</li>
-                <li>The final door needs a strong password.</li>
+                <li>3 Cyber Coins can revive you.</li>
+                <li>You can revive maximum 2 times only.</li>
               </ul>
             </div>
 
+            <div class="info-panel">
+              <h3>Game Rules</h3>
+              <ul>
+                <li>The timer starts when the game starts.</li>
+                <li>The timer keeps running during questions.</li>
+                <li>The timer only stops when the game is paused.</li>
+                <li>Touching walls reduces health by 2.</li>
+                <li>Wrong answers make the fish faster and stronger.</li>
+                <li>The fish buff lets it pass through walls for a short time.</li>
+                <li>The final door needs a strong confirmed password.</li>
+                <li>The final door locks behind you after you escape.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="panel-grid">
             <div class="info-panel">
               <h3>Cyber Tips</h3>
               <ul>
@@ -102,8 +120,19 @@
                 <li>Check URLs before entering details.</li>
                 <li>Do not download unknown files.</li>
                 <li>Never share verification codes.</li>
-                <li>Use long and unique passwords.</li>
+                <li>Use strong and unique passwords.</li>
                 <li>Do not save passwords on shared computers.</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h3>Badges</h3>
+              <ul>
+                <li>Cyber Expert: 14 or more correct answers.</li>
+                <li>Cyber Defender: 11 or more correct answers.</li>
+                <li>Cyber Learner: 8 or more correct answers.</li>
+                <li>Cyber Beginner: less than 8 correct answers.</li>
+                <li>Your badge appears on the final result screen.</li>
               </ul>
             </div>
           </div>
@@ -114,14 +143,13 @@
           </div>
         </div>
 
+        <!-- PAGE 3 -->
         <div id="setupPage3" class="setup-page">
           <h2>Login & Start</h2>
 
-          <div class="loading-box">
-            <div class="pixel-loader">
-              <div></div><div></div><div></div><div></div><div></div>
-            </div>
-            <p>Loading cyber maze...</p>
+          <div class="thumbnail-box">
+            <img src="assets/game-thumbnail.jpg" alt="ClickBait Game Thumbnail">
+            <p>Prepare to escape the cyber maze.</p>
           </div>
 
           <div class="auth-box">
@@ -158,6 +186,22 @@
       </div>
     </div>
 
+    <!-- SEPARATE LOADING SCREEN -->
+    <div id="loadingModal" class="modal">
+      <div class="modal-card loading-screen-card">
+        <img src="assets/game-thumbnail.jpg" alt="ClickBait Thumbnail" class="loading-thumbnail">
+        <h2>Loading Cyber Maze...</h2>
+        <p class="small-text">Get ready. The fish is waiting.</p>
+
+        <div class="loading-bar">
+          <div id="loadingFill"></div>
+        </div>
+
+        <p id="loadingText" class="small-text">Preparing doors...</p>
+      </div>
+    </div>
+
+    <!-- PAUSE -->
     <div id="pauseModal" class="modal">
       <div class="modal-card">
         <h2>Paused</h2>
@@ -171,6 +215,7 @@
       </div>
     </div>
 
+    <!-- QUESTION -->
     <div id="questionModal" class="modal">
       <div class="modal-card question-card">
         <div class="question-head">
@@ -185,6 +230,7 @@
       </div>
     </div>
 
+    <!-- LEARNING -->
     <div id="learningModal" class="modal">
       <div class="modal-card learning-card">
         <h2 id="learningTitle">Learning Point</h2>
@@ -193,19 +239,22 @@
       </div>
     </div>
 
+    <!-- FINAL PASSWORD -->
     <div id="passwordModal" class="modal">
       <div class="modal-card">
         <h2>Final Door: Lock the Fish Out</h2>
         <p class="small-text">
-          Type any password first. The door will only open if the password is strong enough.
+          Type any password first. The door will only open if the password is strong and confirmed.
         </p>
         <input id="passwordInput" class="password-input" type="text" placeholder="Create a strong password">
+        <input id="passwordConfirmInput" class="password-input" type="text" placeholder="Confirm password">
         <ul id="passwordChecks" class="password-checks"></ul>
         <p id="passwordFeedback"></p>
         <button class="restart-btn" onclick="submitPasswordDoor()">Check Password</button>
       </div>
     </div>
 
+    <!-- REVIVE -->
     <div id="reviveModal" class="modal">
       <div class="modal-card">
         <h2>Revive Available</h2>
@@ -217,6 +266,7 @@
       </div>
     </div>
 
+    <!-- END -->
     <div id="endModal" class="modal">
       <div class="modal-card">
         <h2 id="endTitle">Final Result</h2>
