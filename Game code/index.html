@@ -13,126 +13,173 @@
   <div class="topbar">
     <div>
       <h1>ClickBait</h1>
-      <p class="subtitle">Login, learn cyber safety, unlock doors, and escape the angler fish.</p>
+      <p class="subtitle">Escape the maze. Learn cyber safety. Survive the angler fish.</p>
     </div>
   </div>
 
   <div class="hud">
     <div>User<br><span id="userHud">Guest</span></div>
     <div>Score<br><span id="score">0</span></div>
-    <div>Best Score<br><span id="bestScore">0</span></div>
+    <div>Best<br><span id="bestScore">0</span></div>
     <div>Health<br><span id="health">20</span>/20</div>
-    <div>Cyber Coins<br><span id="cyberCoinsHud">0</span></div>
+    <div>Coins<br><span id="cyberCoinsHud">0</span></div>
     <div>Doors<br><span id="doorsHud">0/16</span></div>
     <div>Time<br><span id="time">00:00</span></div>
     <div>Best Time<br><span id="bestTime">--:--</span></div>
-    <div>Fish<br><span id="fishHud">Buff 0 | 0.82</span></div>
+    <div>Fish<br><span id="fishHud">Buff 0</span></div>
   </div>
 
   <div id="gameBox">
     <canvas id="game" width="1160" height="680"></canvas>
     <div id="damageFlash"></div>
 
+    <!-- START / SETUP SCREEN -->
     <div id="startModal" class="modal active">
       <div class="modal-card intro-card">
-        <h2>Welcome to ClickBait</h2>
 
-        <div class="auth-box">
-          <div id="loginPanel">
-            <h3>Login</h3>
-            <input id="loginUsername" class="text-input" type="text" placeholder="Username">
-            <input id="loginPassword" class="text-input" type="password" placeholder="Password">
-            <button class="restart-btn" onclick="loginUser()">Login</button>
-            <button class="link-btn" onclick="showRegister()">Create new account</button>
+        <!-- PAGE 1 -->
+        <div id="setupPage1" class="setup-page active">
+          <h2>Before You Play</h2>
+          <p class="small-text">
+            This game teaches cybersecurity safety through a maze challenge.
+            Please read and accept the safety rules before continuing.
+          </p>
+
+          <div class="panel-grid">
+            <div class="info-panel">
+              <h3>Terms & Conditions</h3>
+              <ul>
+                <li>This game is for cybersecurity learning.</li>
+                <li>Do not enter real personal information.</li>
+                <li>Scores and accounts are stored locally in this browser.</li>
+                <li>Do not exploit bugs or modify files unfairly.</li>
+                <li>Game features may be improved later.</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h3>Parental Control</h3>
+              <ul>
+                <li>No public chat or direct messaging.</li>
+                <li>No real-money purchases or loot boxes.</li>
+                <li>Game can be paused anytime with ESC.</li>
+                <li>Players should not use real names.</li>
+                <li>Progress is stored only on this device.</li>
+              </ul>
+            </div>
           </div>
 
-          <div id="registerPanel" class="hidden">
-            <h3>Register</h3>
-            <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
-            <input id="registerPassword" class="text-input" type="password" placeholder="Choose password">
-            <button class="restart-btn" onclick="registerUser()">Register</button>
-            <button class="link-btn" onclick="showLogin()">Back to login</button>
+          <div class="accept-box">
+            <label><input type="checkbox" id="acceptTerms"> I accept the Terms & Conditions.</label>
+            <label><input type="checkbox" id="acceptParents"> I accept the Parental/Safety rules.</label>
           </div>
 
-          <div id="loggedInBox" class="logged-in hidden">
-            Logged in as <strong id="loggedInName"></strong>
-            <button class="mini-btn" onclick="logoutUser()">Logout</button>
+          <p id="page1Warning" class="warning-text"></p>
+          <button class="restart-btn" onclick="goSetupPage(2)">Continue</button>
+        </div>
+
+        <!-- PAGE 2 -->
+        <div id="setupPage2" class="setup-page">
+          <h2>How to Play + Cyber Tips</h2>
+
+          <div class="panel-grid">
+            <div class="info-panel">
+              <h3>How to Play</h3>
+              <ul>
+                <li>Move using WASD or Arrow Keys.</li>
+                <li>Pause using ESC.</li>
+                <li>Only the next door is shown.</li>
+                <li>Answer cyber questions to unlock doors.</li>
+                <li>Correct answers give score and Cyber Coins.</li>
+                <li>Hints cost 1 Cyber Coin.</li>
+                <li>3 Cyber Coins can revive you with full health.</li>
+                <li>The final door needs a strong password.</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h3>Cyber Tips</h3>
+              <ul>
+                <li>Do not click suspicious links.</li>
+                <li>Check URLs before entering details.</li>
+                <li>Do not download unknown files.</li>
+                <li>Never share verification codes.</li>
+                <li>Use long and unique passwords.</li>
+                <li>Do not save passwords on shared computers.</li>
+              </ul>
+            </div>
           </div>
 
-          <p id="authMessage" class="warning-text"></p>
+          <div class="button-row">
+            <button onclick="goSetupPage(1)">Back</button>
+            <button onclick="goSetupPage(3)">Continue</button>
+          </div>
         </div>
 
-        <div class="intro-tabs">
-          <button onclick="showIntroTab('how')">How to Play</button>
-          <button onclick="showIntroTab('parents')">Parental Controls</button>
-          <button onclick="showIntroTab('terms')">Terms</button>
+        <!-- PAGE 3 -->
+        <div id="setupPage3" class="setup-page">
+          <h2>Login & Start</h2>
+
+          <div class="loading-box">
+            <div class="pixel-loader">
+              <div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <p>Loading cyber maze...</p>
+          </div>
+
+          <div class="auth-box">
+            <div id="loginPanel">
+              <h3>Login</h3>
+              <input id="loginUsername" class="text-input" type="text" placeholder="Username">
+              <input id="loginPassword" class="text-input" type="password" placeholder="Password">
+              <button class="restart-btn" onclick="loginUser()">Login</button>
+              <button class="link-btn" onclick="showRegister()">Create new account</button>
+            </div>
+
+            <div id="registerPanel" class="hidden">
+              <h3>Register</h3>
+              <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
+              <input id="registerPassword" class="text-input" type="password" placeholder="Choose password">
+              <button class="restart-btn" onclick="registerUser()">Register</button>
+              <button class="link-btn" onclick="showLogin()">Back to login</button>
+            </div>
+
+            <div id="loggedInBox" class="logged-in hidden">
+              Logged in as <strong id="loggedInName"></strong>
+              <button class="mini-btn" onclick="logoutUser()">Logout</button>
+            </div>
+
+            <p id="authMessage" class="warning-text"></p>
+          </div>
+
+          <div class="button-row">
+            <button onclick="goSetupPage(2)">Back</button>
+            <button onclick="startGame()">Start Game</button>
+          </div>
         </div>
 
-        <div id="intro-how" class="intro-panel active">
-          <h3>How to Play</h3>
-          <ul>
-            <li>Move using WASD or Arrow Keys.</li>
-            <li>Pause using ESC.</li>
-            <li>Only the next door is shown, so the maze stays clean.</li>
-            <li>Correct answers unlock doors and give Cyber Coins.</li>
-            <li>Hints cost 1 Cyber Coin.</li>
-            <li>Wrong answers buff the fish and return you to the game.</li>
-            <li>3 Cyber Coins can revive you with full health.</li>
-            <li>The final door needs a strong password. Once locked, the fish cannot follow.</li>
-          </ul>
-        </div>
-
-        <div id="intro-parents" class="intro-panel">
-          <h3>Parental Controls</h3>
-          <ul>
-            <li>The game supports safe gameplay for younger users.</li>
-            <li>Scores and progress are stored locally in the browser.</li>
-            <li>No public chat, voice chat, friend requests, or direct messaging.</li>
-            <li>No microtransactions, loot boxes, or real-money purchases.</li>
-            <li>Players are encouraged not to use real names or personal information.</li>
-            <li>Gameplay can be paused with ESC for supervision or breaks.</li>
-          </ul>
-        </div>
-
-        <div id="intro-terms" class="intro-panel">
-          <h3>Terms and Conditions</h3>
-          <ul>
-            <li>This game is for educational cybersecurity awareness.</li>
-            <li>Accounts, scores, and best times are stored locally in the browser cache/localStorage.</li>
-            <li>Do not enter real personal data, addresses, or financial details.</li>
-            <li>Players must not exploit bugs or modify game files unfairly.</li>
-            <li>This game is designed mainly for users aged 11–16.</li>
-            <li>Game features may be improved in future versions.</li>
-          </ul>
-        </div>
-
-        <div class="accept-box">
-          <label><input type="checkbox" id="acceptHow"> I have read How to Play.</label>
-          <label><input type="checkbox" id="acceptParents"> I have read Parental Controls.</label>
-          <label><input type="checkbox" id="acceptTerms"> I agree to the Terms and Conditions.</label>
-        </div>
-
-        <p id="agreeWarning" class="warning-text"></p>
-
-        <button class="restart-btn" onclick="startGame()">Start Game</button>
       </div>
     </div>
 
+    <!-- PAUSE -->
     <div id="pauseModal" class="modal">
       <div class="modal-card">
         <h2>Paused</h2>
-        <p class="small-text">Press ESC or Resume to continue.</p>
+        <p class="small-text">Take a break. Your game is safe.</p>
         <div class="button-row vertical">
           <button onclick="resumeGame()">Resume</button>
+          <button onclick="toggleSound()" id="soundBtn">Sound: On</button>
           <button onclick="restartGame()">Restart</button>
+          <button onclick="exitGame()">Exit Game</button>
         </div>
       </div>
     </div>
 
+    <!-- QUESTION -->
     <div id="questionModal" class="modal">
       <div class="modal-card question-card">
         <div class="question-head">
-          <h2 id="questionTitle">Cyber Door Challenge</h2>
+          <h2 id="questionTitle">Cyber Door</h2>
           <div class="timer-pill">Time: <span id="questionTimer">18</span>s</div>
         </div>
         <p class="question" id="questionText"></p>
@@ -143,6 +190,7 @@
       </div>
     </div>
 
+    <!-- LEARNING -->
     <div id="learningModal" class="modal">
       <div class="modal-card learning-card">
         <h2 id="learningTitle">Learning Point</h2>
@@ -150,11 +198,12 @@
       </div>
     </div>
 
+    <!-- FINAL PASSWORD -->
     <div id="passwordModal" class="modal">
       <div class="modal-card">
-        <h2>Final Door: Create a Strong Password</h2>
+        <h2>Final Door: Lock the Fish Out</h2>
         <p class="small-text">
-          Create a strong password to lock the final door behind you. If it is strong, the fish cannot follow you.
+          Create a strong password. If it is strong, the final door locks behind you and the fish cannot follow.
         </p>
         <input id="passwordInput" class="password-input" type="text" placeholder="Create a strong password">
         <ul id="passwordChecks" class="password-checks"></ul>
@@ -163,6 +212,7 @@
       </div>
     </div>
 
+    <!-- REVIVE -->
     <div id="reviveModal" class="modal">
       <div class="modal-card">
         <h2>Revive Available</h2>
@@ -174,23 +224,26 @@
       </div>
     </div>
 
+    <!-- END -->
     <div id="endModal" class="modal">
       <div class="modal-card">
         <h2 id="endTitle">Final Result</h2>
         <div id="endText" class="small-text"></div>
-        <button class="restart-btn" onclick="restartGame()">Restart</button>
+        <div class="button-row">
+          <button onclick="restartGame()">Restart</button>
+          <button onclick="exitGame()">Exit Game</button>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <div id="toast">
-    Login or register, accept all safety rules, then start the game.
-  </div>
-
-  <div class="controls">Move: WASD / Arrow Keys &nbsp; | &nbsp; Pause: ESC</div>
+  <div id="toast">Accept the rules, login or register, then start the game.</div>
+  <div class="controls">Move: WASD / Arrow Keys | Pause: ESC</div>
 
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
+
