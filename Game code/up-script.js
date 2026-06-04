@@ -4,6 +4,7 @@ const ROWS = 17;
 
 const TOTAL_HEALTH = 20;
 const REVIVE_COST = 3;
+const MAX_REVIVES = 2;
 const QUESTION_TIME = 18;
 const PLAYER_SPEED = 2.45;
 const BASE_ENEMY_SPEED = 0.82;
@@ -387,6 +388,7 @@ let currentDoor = null;
 let animationId = null;
 let questionInterval = null;
 let ghostTimer = null;
+let gameTimerInterval = null;
 
 let questionTimeLeft = QUESTION_TIME;
 let enemyGhost = false;
@@ -404,6 +406,7 @@ let hintsUsed = 0;
 let questionsAnswered = 0;
 let correctAnswers = 0;
 let wrongAnswers = 0;
+let revivesUsed = 0;
 
 function playSound(name) {
   if (!soundOn) return;
@@ -443,6 +446,26 @@ function toggleSound() {
 
 function clearKeys() {
   keys = {};
+}
+
+function startOverallTimer() {
+  stopOverallTimer();
+
+  startTime = Date.now() - elapsed * 1000;
+
+  gameTimerInterval = setInterval(() => {
+    if (!paused) {
+      elapsed = Math.floor((Date.now() - startTime) / 1000);
+      updateHud();
+    }
+  }, 250);
+}
+
+function stopOverallTimer() {
+  if (gameTimerInterval) {
+    clearInterval(gameTimerInterval);
+    gameTimerInterval = null;
+  }
 }
 
 function getUsers() {
@@ -709,7 +732,8 @@ function resetState() {
   doors = DOOR_CELLS.map((door, index) => ({
     ...door,
     id: index + 1,
-    unlocked: false
+    unlocked: false,
+    lockedBehind: false
   }));
 
   coins = COIN_CELLS.map(cell => {
@@ -751,7 +775,9 @@ function resetState() {
   questionsAnswered = 0;
   correctAnswers = 0;
   wrongAnswers = 0;
+  revivesUsed = 0;
 
+  stopOverallTimer();
   clearKeys();
 
   if (ghostTimer) clearTimeout(ghostTimer);
@@ -837,24 +863,36 @@ function drawDoors() {
     if (!door.unlocked && (!activeDoor || door.id !== activeDoor.id)) continue;
 
     const p = cellCenter(door);
-    const img = door.unlocked ? doorOpenImg : doorClosedImg;
+
+    let img = door.unlocked ? doorOpenImg : doorClosedImg;
+
+    if (door.lockedBehind) {
+      img = doorClosedImg;
+    }
 
     if (img.complete && img.naturalWidth > 0) {
       ctx.drawImage(img, p.x - 20, p.y - 34, 40, 56);
     } else {
-      ctx.fillStyle = door.unlocked ? "#22c55e" : "#facc15";
+      ctx.fillStyle = door.lockedBehind ? "#ef4444" : door.unlocked ? "#22c55e" : "#facc15";
       ctx.fillRect(p.x - 16, p.y - 26, 32, 42);
     }
 
     ctx.fillStyle = "#020617";
     ctx.fillRect(p.x - 31, p.y - 62, 64, 18);
 
-    ctx.strokeStyle = "#67e8f9";
+    ctx.strokeStyle = door.lockedBehind ? "#ef4444" : "#67e8f9";
     ctx.strokeRect(p.x - 31, p.y - 62, 64, 18);
 
     ctx.fillStyle = "#e0f2fe";
     ctx.font = "10px Courier New";
-    ctx.fillText(door.final ? "FINAL" : `DOOR ${door.id}`, p.x - 24, p.y - 49);
+
+    let label = door.final ? "FINAL" : `DOOR ${door.id}`;
+
+    if (door.lockedBehind) {
+      label = "LOCKED";
+    }
+
+    ctx.fillText(label, p.x - 24, p.y - 49);
   }
 }
 
@@ -1112,8 +1150,8 @@ function answerQuestion(selected, question, timedOut) {
     cyberCoins++;
     currentDoor.unlocked = true;
 
-    feedback.textContent = "+20 score and +1 Cyber Coin.";
-    toast.textContent = `Door ${currentDoor.id} unlocked. Next door revealed.`;
+    feedback.textContent = "Correct answer. +20 score and +1 Cyber Coin.";
+    toast.textContent = `Door ${currentDoor.id} unlocked. Read the explanation, then continue.`;
 
     playSound("correct");
     playSound("unlock");
@@ -1131,7 +1169,9 @@ function answerQuestion(selected, question, timedOut) {
     setToCell(player, currentDoor.spawn, player.size);
     doorCooldownUntil = Date.now() + 1400;
 
-    feedback.textContent = timedOut ? "Time up. Fish buff activated." : "Wrong answer. Fish buff activated.";
+    feedback.textContent = timedOut
+      ? "Time up. Fish buff activated."
+      : "Wrong answer. Fish buff activated.";
 
     playSound("wrong");
 
@@ -1148,10 +1188,14 @@ function showLearning(title, text, correct) {
 
   learningModal.classList.add("active");
 
-  setTimeout(() => {
-    learningModal.classList.remove("active");
-    closeQuestionAndResume();
-  }, correct ? 1500 : 1300);
+  toast.textContent = correct
+    ? "Correct answer. Read the learning point, then press Continue."
+    : "Wrong answer. Read the learning point, then press Continue.";
+}
+
+function continueLearning() {
+  learningModal.classList.remove("active");
+  closeQuestionAndResume();
 }
 
 function closeQuestionAndResume() {
@@ -1200,77 +1244,98 @@ function openPasswordDoor(door) {
   passwordModal.classList.add("active");
 
   playSound("lock");
-  toast.textContent = "Final door: create a strong password to lock the fish out.";
+  toast.textContent = "Final door: type any password. The door opens only if it is strong.";
+}
+
+function getPasswordIssues(password) {
+  const issues = [];
+
+  if (password.length < 8) {
+    issues.push("Add at least 8 characters.");
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    issues.push("Add one uppercase letter.");
+  }
+
+  if (!/[a-z]/.test(password)) {
+    issues.push("Add one lowercase letter.");
+  }
+
+  if (!/[0-9]/.test(password)) {
+    issues.push("Add one number.");
+  }
+
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    issues.push("Add one special character.");
+  }
+
+  return issues;
 }
 
 function updatePasswordChecks() {
   const password = passwordInput.value;
+  const issues = getPasswordIssues(password);
 
   const checks = [
-    { ok: password.length >= 12, text: "At least 12 characters" },
+    { ok: password.length >= 8, text: "At least 8 characters" },
     { ok: /[A-Z]/.test(password), text: "One uppercase letter" },
     { ok: /[a-z]/.test(password), text: "One lowercase letter" },
     { ok: /[0-9]/.test(password), text: "One number" },
-    { ok: /[^A-Za-z0-9]/.test(password), text: "One symbol" },
-    { ok: !password.toLowerCase().includes("password"), text: "Does not use the word password" }
+    { ok: /[^A-Za-z0-9]/.test(password), text: "One special character" }
   ];
 
   passwordChecks.innerHTML = checks
     .map(check => `<li class="${check.ok ? "ok" : "bad"}">${check.ok ? "✅" : "❌"} ${check.text}</li>`)
     .join("");
 
-  return checks.every(check => check.ok);
+  return issues.length === 0;
 }
 
 function submitPasswordDoor() {
   if (!passwordOpen) return;
 
-  if (updatePasswordChecks()) {
-    score += 30;
-    cyberCoins++;
-    currentDoor.unlocked = true;
+  const password = passwordInput.value;
+  const issues = getPasswordIssues(password);
 
-    finalPasswordLocked = true;
-    enemyFrozenUntil = Date.now() + 999999;
-    enemyGhost = false;
-    enemyPath = [];
+  if (issues.length > 0) {
+    passwordFeedback.innerHTML = `
+      Weak password. Please fix:<br>
+      ${issues.map(issue => `• ${issue}`).join("<br>")}
+    `;
 
-    passwordFeedback.textContent = "Strong password. Door locked. The fish cannot follow.";
-    toast.textContent = "Final door secured. Run to EXIT!";
-
-    playSound("lock");
-    playSound("open");
-
-    updateHud();
-    draw();
-
-    setTimeout(() => {
-      passwordModal.classList.remove("active");
-      passwordOpen = false;
-      currentDoor = null;
-      clearKeys();
-      resumeGame(false);
-    }, 1000);
-  } else {
-    score = Math.max(0, score - 10);
-
-    buffFish();
-    setToCell(player, currentDoor.spawn, player.size);
-    doorCooldownUntil = Date.now() + 1600;
-
-    passwordFeedback.textContent = "Weak password. Fish buff activated.";
-
-    updateHud();
-    draw();
-
-    setTimeout(() => {
-      passwordModal.classList.remove("active");
-      passwordOpen = false;
-      currentDoor = null;
-      clearKeys();
-      resumeGame(false);
-    }, 1000);
+    toast.textContent = "Weak password. Fix the missing requirements before the final door opens.";
+    playSound("wrong");
+    updatePasswordChecks();
+    return;
   }
+
+  score += 30;
+  cyberCoins++;
+  currentDoor.unlocked = true;
+  currentDoor.lockedBehind = false;
+
+  finalPasswordLocked = true;
+  enemyFrozenUntil = Date.now() + 999999;
+  enemyGhost = false;
+  enemyPath = [];
+
+  passwordFeedback.textContent = "Strong password. Final door unlocked. The fish cannot follow you.";
+  toast.textContent = "Strong passwords protect accounts. Run to EXIT and lock the fish out!";
+
+  playSound("lock");
+  playSound("open");
+
+  updateHud();
+  draw();
+
+  setTimeout(() => {
+    passwordModal.classList.remove("active");
+    passwordOpen = false;
+    currentDoor = null;
+    clearKeys();
+    resumeGame(false);
+  }, 1000);
 }
 
 function moveEnemy() {
@@ -1344,6 +1409,23 @@ function checkWin() {
   }
 }
 
+function checkFinalDoorRelock() {
+  if (!doors) return;
+
+  const finalDoor = doors[doors.length - 1];
+
+  if (!finalDoor || !finalDoor.unlocked || finalDoor.lockedBehind) return;
+
+  const playerCell = cellOf(player, player.size);
+
+  if (playerCell.r < finalDoor.r || dist(center(player, player.size), cellCenter(EXIT)) < 35) {
+    finalDoor.lockedBehind = true;
+    toast.textContent = "Final door locked behind you. The fish is trapped outside.";
+    playSound("lock");
+    draw();
+  }
+}
+
 function getProgressDoorNumber() {
   const active = nextDoor();
 
@@ -1380,10 +1462,16 @@ function handlePlayerDeath(reason) {
 
   lastDeathReason = reason;
 
+  if (revivesUsed >= MAX_REVIVES) {
+    endGame(false, "No revives left. You used all 2 revives.");
+    return;
+  }
+
   if (cyberCoins >= REVIVE_COST) {
     reviveText.innerHTML = `
       ${reason}<br><br>
       You have <strong>${cyberCoins}</strong> Cyber Coins.<br>
+      Revives Used: <strong>${revivesUsed} / ${MAX_REVIVES}</strong><br><br>
       Spend <strong>${REVIVE_COST}</strong> Cyber Coins to revive with full health?
       <br><br>
       The fish will respawn two doors behind your current progress.
@@ -1392,14 +1480,21 @@ function handlePlayerDeath(reason) {
     reviveModal.classList.add("active");
     playSound("warning");
   } else {
-    endGame(false, reason);
+    endGame(false, "Not enough Cyber Coins to revive.");
   }
 }
 
 function useRevive() {
+  if (revivesUsed >= MAX_REVIVES) {
+    reviveModal.classList.remove("active");
+    endGame(false, "No revives left. You used all 2 revives.");
+    return;
+  }
+
   reviveModal.classList.remove("active");
 
   cyberCoins -= REVIVE_COST;
+  revivesUsed++;
   health = TOTAL_HEALTH;
 
   setToCell(player, getPlayerRespawnCell(), player.size);
@@ -1411,7 +1506,7 @@ function useRevive() {
 
   clearKeys();
 
-  toast.textContent = `Revived. Full health restored. Fish respawned 2 doors behind.`;
+  toast.textContent = `Revived. Revives Used: ${revivesUsed}/${MAX_REVIVES}. Fish respawned 2 doors behind.`;
 
   playSound("bonus");
   updateHud();
@@ -1473,6 +1568,7 @@ function endGame(won, message) {
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
 
+  stopOverallTimer();
   stopMusic();
 
   if (won) {
@@ -1491,12 +1587,13 @@ function endGame(won, message) {
         <div>Best Time</div><strong>${bestTime ? formatTime(bestTime) : "--:--"}</strong>
         <div>Correct Answers</div><strong>${correctAnswers}/${questionsAnswered}</strong>
         <div>Hints Used</div><strong>${hintsUsed}</strong>
+        <div>Revives Used</div><strong>${revivesUsed} / ${MAX_REVIVES}</strong>
         <div>Cyber Coins Left</div><strong>${cyberCoins}</strong>
         <div>Fish Buff Level</div><strong>${fishBuffLevel}</strong>
         <div>Badge</div><strong>${getBadge()}</strong>
       </div>
       <p class="small-text">
-        Cyber lesson: Think before clicking, check links, protect passwords, and never share verification codes.
+        Strong cyber habits help you escape real online dangers. Think before you click.
       </p>
     `;
   } else {
@@ -1515,9 +1612,11 @@ function endGame(won, message) {
         <div>Doors Completed</div><strong>${doors.filter(door => door.unlocked).length}/${doors.length}</strong>
         <div>Correct Answers</div><strong>${correctAnswers}/${questionsAnswered}</strong>
         <div>Hints Used</div><strong>${hintsUsed}</strong>
+        <div>Revives Used</div><strong>${revivesUsed} / ${MAX_REVIVES}</strong>
+        <div>Badge</div><strong>${getBadge()}</strong>
       </div>
       <p class="small-text">
-        Cyber lesson: Slow down and check before clicking. Scammers use pressure to make you rush.
+        Strong cyber habits help you escape real online dangers. Think before you click.
       </p>
     `;
   }
@@ -1531,13 +1630,12 @@ function loop() {
     return;
   }
 
-  elapsed = Math.floor((Date.now() - startTime) / 1000);
-
   movePlayer();
   moveEnemy();
   checkCoins();
   checkDoor();
   checkCaught();
+  checkFinalDoorRelock();
   checkWin();
   updateHud();
   draw();
@@ -1565,10 +1663,12 @@ function startGame() {
 
   running = true;
   paused = false;
+  elapsed = 0;
   startTime = Date.now();
 
   toast.textContent = "Only the next door is shown. Answer carefully and survive.";
 
+  startOverallTimer();
   startMusic();
   loop();
 }
@@ -1580,6 +1680,7 @@ function pauseGame() {
 
   paused = true;
   running = false;
+  stopOverallTimer();
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1610,8 +1711,8 @@ function resumeGame(closePause = true) {
 
   paused = false;
   running = true;
-  startTime = Date.now() - elapsed * 1000;
 
+  startOverallTimer();
   startMusic();
 
   if (!animationId) {
@@ -1635,10 +1736,13 @@ function restartGame() {
   resetState();
 
   running = true;
+  paused = false;
+  elapsed = 0;
   startTime = Date.now();
 
   toast.textContent = "Restarted. Only the next door is visible.";
 
+  startOverallTimer();
   startMusic();
   loop();
 }
@@ -1656,6 +1760,7 @@ function exitGame() {
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
 
+  stopOverallTimer();
   stopMusic();
   clearKeys();
   resetState();
