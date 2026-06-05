@@ -401,6 +401,7 @@ let lastPathUpdate = 0;
 let lastWallDamage = 0;
 
 let playerFacing = "right";
+let playerMoving = false;
 let lastDeathReason = "";
 let enemyFrozenUntil = 0;
 let doorCooldownUntil = 0;
@@ -450,6 +451,7 @@ function toggleSound() {
 
 function clearKeys() {
   keys = {};
+  playerMoving = false;
 }
 
 function startOverallTimer() {
@@ -768,6 +770,7 @@ function resetState() {
   enemyGhost = false;
   enemyPath = [];
   playerFacing = "right";
+  playerMoving = false;
 
   lastPathUpdate = 0;
   lastWallDamage = 0;
@@ -830,6 +833,7 @@ function drawTile(c, r, type) {
 }
 
 function draw() {
+  ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (let r = 0; r < ROWS; r++) {
@@ -920,19 +924,22 @@ function drawPlayer() {
   const x = player.x - 6;
   const y = player.y - 10;
 
+  const walkBounce = playerMoving ? Math.sin(Date.now() / 90) * 2 : 0;
+
   ctx.save();
+  ctx.imageSmoothingEnabled = false;
 
   if (playerImg.complete && playerImg.naturalWidth > 0) {
     if (playerFacing === "left") {
-      ctx.translate(x + w, y);
+      ctx.translate(x + w, y + walkBounce);
       ctx.scale(-1, 1);
       ctx.drawImage(playerImg, 0, 0, w, h);
     } else {
-      ctx.drawImage(playerImg, x, y, w, h);
+      ctx.drawImage(playerImg, x, y + walkBounce, w, h);
     }
   } else {
     ctx.fillStyle = "#22c55e";
-    ctx.fillRect(player.x + 5, player.y + 4, 18, 22);
+    ctx.fillRect(player.x + 5, player.y + 4 + walkBounce, 18, 22);
   }
 
   ctx.restore();
@@ -1016,8 +1023,10 @@ function movePlayer() {
   if (keys.arrowleft || keys.a) dx -= PLAYER_SPEED;
   if (keys.arrowright || keys.d) dx += PLAYER_SPEED;
 
-  if (dx > 0) playerFacing = "left";
-  if (dx < 0) playerFacing = "right";
+  playerMoving = dx !== 0 || dy !== 0;
+
+  if (dx > 0) playerFacing = "right";
+  if (dx < 0) playerFacing = "left";
 
   if (dx !== 0 && dy !== 0) {
     dx *= 0.707;
@@ -1514,6 +1523,7 @@ function useRevive() {
   enemyPath = [];
   enemyGhost = false;
   playerFacing = "right";
+  playerMoving = false;
 
   clearKeys();
 
@@ -1681,22 +1691,32 @@ function startGame() {
     "Loading cyber questions...",
     "Starting fish AI...",
     "Checking password door...",
+    "Activating wall collision system...",
+    "Preparing Cyber Coins...",
+    "Loading final password challenge...",
     "Entering maze..."
   ];
 
+  const totalLoadingTime = 6000;
+  const stepTime = totalLoadingTime / loadingSteps.length;
+
   const loadInterval = setInterval(() => {
-    progress += 20;
-    loadingFill.style.width = progress + "%";
+    progress++;
 
-    const stepIndex = Math.min(Math.floor(progress / 20) - 1, loadingSteps.length - 1);
-    loadingText.textContent = loadingSteps[Math.max(0, stepIndex)];
+    const percent = Math.min(100, Math.round((progress / loadingSteps.length) * 100));
+    loadingFill.style.width = percent + "%";
 
-    if (progress >= 100) {
+    loadingText.textContent = loadingSteps[progress - 1] || "Entering maze...";
+
+    if (progress >= loadingSteps.length) {
       clearInterval(loadInterval);
-      loadingModal.classList.remove("active");
-      beginGame();
+
+      setTimeout(() => {
+        loadingModal.classList.remove("active");
+        beginGame();
+      }, 300);
     }
-  }, 350);
+  }, stepTime);
 }
 
 function beginGame() {
