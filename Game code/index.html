@@ -188,18 +188,30 @@
 
     <!-- SEPARATE LOADING SCREEN -->
     <div id="loadingModal" class="modal">
-      <div class="modal-card loading-screen-card">
-        <img src="assets/game-thumbnail.jpg" alt="ClickBait Thumbnail" class="loading-thumbnail">
-        <h2>Loading Cyber Maze...</h2>
-        <p class="small-text">Get ready. The fish is waiting.</p>
+  <div class="loading-fullscreen">
+    <img src="assets/thumbnail-screen.png" alt="Cyber Maze Loading Screen" class="loading-bg-image">
 
-        <div class="loading-bar">
+    <div class="loading-overlay"></div>
+
+    <div class="loading-content">
+      <h2>Entering Cyber Maze...</h2>
+      <p class="loading-subtitle">Prepare your mind. The phishing fish is already inside.</p>
+
+      <div class="loading-status-box">
+        <p id="loadingText">Preparing doors...</p>
+
+        <div class="loading-bar-pro">
           <div id="loadingFill"></div>
         </div>
 
-        <p id="loadingText" class="small-text">Preparing doors...</p>
+        <div class="loading-tips">
+          <span>Cyber Tip:</span>
+          Think before you click. Real danger often looks safe.
+        </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- PAUSE -->
     <div id="pauseModal" class="modal">
