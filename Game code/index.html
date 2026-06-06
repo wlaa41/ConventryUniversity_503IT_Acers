@@ -33,11 +33,9 @@
     <canvas id="game" width="1160" height="680"></canvas>
     <div id="damageFlash"></div>
 
-    <!-- START / SETUP SCREEN -->
     <div id="startModal" class="modal active">
       <div class="modal-card intro-card">
 
-        <!-- PAGE 1 -->
         <div id="setupPage1" class="setup-page active">
           <h2>Before You Play</h2>
           <p class="small-text">
@@ -78,7 +76,6 @@
           <button class="restart-btn" onclick="goSetupPage(2)">Continue</button>
         </div>
 
-        <!-- PAGE 2 -->
         <div id="setupPage2" class="setup-page">
           <h2>How to Play + Game Rules</h2>
 
@@ -143,38 +140,62 @@
           </div>
         </div>
 
-        <!-- PAGE 3 -->
         <div id="setupPage3" class="setup-page">
           <h2>Login & Start</h2>
 
-          <div class="thumbnail-box">
-            <img src="assets/game-thumbnail.jpg" alt="ClickBait Game Thumbnail">
-            <p>Prepare to escape the cyber maze.</p>
-          </div>
+          <div class="login-start-layout">
 
-          <div class="auth-box">
-            <div id="loginPanel">
-              <h3>Login</h3>
-              <input id="loginUsername" class="text-input" type="text" placeholder="Username">
-              <input id="loginPassword" class="text-input" type="password" placeholder="Password">
-              <button class="restart-btn" onclick="loginUser()">Login</button>
-              <button class="link-btn" onclick="showRegister()">Create new account</button>
+            <div class="login-preview">
+              <img src="assets/game-thumbnail.jpg" alt="ClickBait Game Thumbnail">
+              <h3>ClickBait Cyber Maze</h3>
+              <p>
+                Learn cyber safety by escaping doors, avoiding phishing traps,
+                and surviving the angler fish.
+              </p>
+
+              <div class="mini-rules">
+                <span>16 Doors</span>
+                <span>Cyber Coins</span>
+                <span>Final Password Door</span>
+                <span>2 Revives Max</span>
+              </div>
             </div>
 
-            <div id="registerPanel" class="hidden">
-              <h3>Register</h3>
-              <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
-              <input id="registerPassword" class="text-input" type="password" placeholder="Choose password">
-              <button class="restart-btn" onclick="registerUser()">Register</button>
-              <button class="link-btn" onclick="showLogin()">Back to login</button>
+            <div class="auth-box professional-auth">
+              <div id="loginPanel">
+                <h3>Player Login</h3>
+                <p class="auth-subtitle">Login to save your best score and time.</p>
+
+                <input id="loginUsername" class="text-input" type="text" placeholder="Username">
+                <input id="loginPassword" class="text-input" type="password" placeholder="Password">
+
+                <button class="restart-btn" onclick="loginUser()">Login</button>
+                <button class="link-btn" onclick="showRegister()">Create new account</button>
+              </div>
+
+              <div id="registerPanel" class="hidden">
+                <h3>Create Player Account</h3>
+                <p class="auth-subtitle">Use a strong password to learn good cyber habits.</p>
+
+                <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
+                <input id="registerPassword" class="text-input" type="password" placeholder="Choose strong password">
+
+                <div id="registerStrength" class="register-strength">
+                  Password needs 8 characters, uppercase, lowercase, number, and special character.
+                </div>
+
+                <button class="restart-btn" onclick="registerUser()">Register</button>
+                <button class="link-btn" onclick="showLogin()">Back to login</button>
+              </div>
+
+              <div id="loggedInBox" class="logged-in hidden">
+                Logged in as <strong id="loggedInName"></strong>
+                <button class="mini-btn" onclick="logoutUser()">Logout</button>
+              </div>
+
+              <p id="authMessage" class="warning-text"></p>
             </div>
 
-            <div id="loggedInBox" class="logged-in hidden">
-              Logged in as <strong id="loggedInName"></strong>
-              <button class="mini-btn" onclick="logoutUser()">Logout</button>
-            </div>
-
-            <p id="authMessage" class="warning-text"></p>
           </div>
 
           <div class="button-row">
@@ -186,34 +207,32 @@
       </div>
     </div>
 
-    <!-- SEPARATE LOADING SCREEN -->
     <div id="loadingModal" class="modal">
-  <div class="loading-fullscreen">
-    <img src="assets/thumbnail-screen.png" alt="Cyber Maze Loading Screen" class="loading-bg-image">
+      <div class="loading-fullscreen">
+        <img src="assets/thumbnail-screen.png" alt="Cyber Maze Loading Screen" class="loading-bg-image">
 
-    <div class="loading-overlay"></div>
+        <div class="loading-overlay"></div>
 
-    <div class="loading-content">
-      <h2>Entering Cyber Maze...</h2>
-      <p class="loading-subtitle">Prepare your mind. The phishing fish is already inside.</p>
+        <div class="loading-content">
+          <h2>Entering Cyber Maze...</h2>
+          <p class="loading-subtitle">Prepare your mind. The phishing fish is already inside.</p>
 
-      <div class="loading-status-box">
-        <p id="loadingText">Preparing doors...</p>
+          <div class="loading-status-box">
+            <p id="loadingText">Preparing doors...</p>
 
-        <div class="loading-bar-pro">
-          <div id="loadingFill"></div>
-        </div>
+            <div class="loading-bar-pro">
+              <div id="loadingFill"></div>
+            </div>
 
-        <div class="loading-tips">
-          <span>Cyber Tip:</span>
-          Think before you click. Real danger often looks safe.
+            <div class="loading-tips">
+              <span>Cyber Tip:</span>
+              Think before you click. Real danger often looks safe.
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-    <!-- PAUSE -->
     <div id="pauseModal" class="modal">
       <div class="modal-card">
         <h2>Paused</h2>
@@ -227,7 +246,6 @@
       </div>
     </div>
 
-    <!-- QUESTION -->
     <div id="questionModal" class="modal">
       <div class="modal-card question-card">
         <div class="question-head">
@@ -242,7 +260,6 @@
       </div>
     </div>
 
-    <!-- LEARNING -->
     <div id="learningModal" class="modal">
       <div class="modal-card learning-card">
         <h2 id="learningTitle">Learning Point</h2>
@@ -251,7 +268,6 @@
       </div>
     </div>
 
-    <!-- FINAL PASSWORD -->
     <div id="passwordModal" class="modal">
       <div class="modal-card">
         <h2>Final Door: Lock the Fish Out</h2>
@@ -266,7 +282,6 @@
       </div>
     </div>
 
-    <!-- REVIVE -->
     <div id="reviveModal" class="modal">
       <div class="modal-card">
         <h2>Revive Available</h2>
@@ -278,15 +293,44 @@
       </div>
     </div>
 
-    <!-- END -->
     <div id="endModal" class="modal">
       <div class="modal-card">
         <h2 id="endTitle">Final Result</h2>
         <div id="endText" class="small-text"></div>
         <div class="button-row">
           <button onclick="restartGame()">Restart</button>
+          <button onclick="openCyberTips()">Cyber Safety Tips</button>
           <button onclick="exitGame()">Exit Game</button>
         </div>
+      </div>
+    </div>
+
+    <div id="tipsModal" class="modal">
+      <div class="modal-card cyber-tips-card">
+        <h2>Cyber Safety Tips</h2>
+        <p class="small-text">
+          These tips are for young players aged 11–16. Use them in school, gaming, and social media.
+        </p>
+
+        <div class="tips-grid">
+          <div>1. Think before clicking any link.</div>
+          <div>2. Check the website address before logging in.</div>
+          <div>3. Never share verification codes.</div>
+          <div>4. Use strong and unique passwords.</div>
+          <div>5. Do not reuse the same password everywhere.</div>
+          <div>6. Ask an adult or teacher if a message feels suspicious.</div>
+          <div>7. Do not download free hacks, cheats, or unknown files.</div>
+          <div>8. Be careful with public WiFi when logging into accounts.</div>
+          <div>9. Do not save passwords on school or shared computers.</div>
+          <div>10. Do not trust messages only because they look professional.</div>
+          <div>11. Scammers often use fear and urgency to rush you.</div>
+          <div>12. Keep your gaming accounts protected with strong passwords.</div>
+          <div>13. Do not share private photos, address, school name, or phone number.</div>
+          <div>14. Report suspicious messages instead of replying to them.</div>
+          <div>15. When unsure, stop, check, and ask for help.</div>
+        </div>
+
+        <button class="restart-btn" onclick="closeCyberTips()">Back to Result</button>
       </div>
     </div>
 
