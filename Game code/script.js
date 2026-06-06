@@ -135,6 +135,7 @@ const passwordModal = $("passwordModal");
 const reviveModal = $("reviveModal");
 const learningModal = $("learningModal");
 const endModal = $("endModal");
+const tipsModal = $("tipsModal");
 
 const qTitle = $("questionTitle");
 const qText = $("questionText");
@@ -162,6 +163,7 @@ const loginUsername = $("loginUsername");
 const loginPassword = $("loginPassword");
 const registerUsername = $("registerUsername");
 const registerPassword = $("registerPassword");
+const registerStrength = $("registerStrength");
 const authMessage = $("authMessage");
 const loggedInBox = $("loggedInBox");
 const loggedInName = $("loggedInName");
@@ -490,6 +492,7 @@ function showRegister() {
   loginPanel.classList.add("hidden");
   registerPanel.classList.remove("hidden");
   authMessage.textContent = "";
+  updateRegisterStrength();
   playSound("click");
 }
 
@@ -500,13 +503,61 @@ function showLogin() {
   playSound("click");
 }
 
+function getRegisterPasswordIssues(password) {
+  const issues = [];
+
+  if (password.length < 8) issues.push("8 characters");
+  if (!/[A-Z]/.test(password)) issues.push("uppercase letter");
+  if (!/[a-z]/.test(password)) issues.push("lowercase letter");
+  if (!/[0-9]/.test(password)) issues.push("number");
+  if (!/[^A-Za-z0-9]/.test(password)) issues.push("special character");
+
+  return issues;
+}
+
+function updateRegisterStrength() {
+  if (!registerStrength) return;
+
+  const password = registerPassword.value;
+  const issues = getRegisterPasswordIssues(password);
+
+  registerStrength.classList.remove("medium", "strong");
+
+  if (!password) {
+    registerStrength.textContent = "Password needs 8 characters, uppercase, lowercase, number, and special character.";
+    return;
+  }
+
+  if (issues.length === 0) {
+    registerStrength.textContent = "Strong password. Good cyber habit!";
+    registerStrength.classList.add("strong");
+    return;
+  }
+
+  if (issues.length <= 2) {
+    registerStrength.textContent = "Almost strong. Add: " + issues.join(", ") + ".";
+    registerStrength.classList.add("medium");
+    return;
+  }
+
+  registerStrength.textContent = "Weak password. Add: " + issues.join(", ") + ".";
+}
+
 function registerUser() {
   const username = safeName(registerUsername.value);
   const password = registerPassword.value;
   const users = getUsers();
 
-  if (!username || password.length < 4) {
-    authMessage.textContent = "Use a username and at least 4 password characters.";
+  if (!username) {
+    authMessage.textContent = "Please enter a username.";
+    return;
+  }
+
+  const passwordIssues = getRegisterPasswordIssues(password);
+
+  if (passwordIssues.length > 0) {
+    authMessage.textContent = "Use a stronger password. Missing: " + passwordIssues.join(", ") + ".";
+    updateRegisterStrength();
     return;
   }
 
@@ -1645,6 +1696,18 @@ function endGame(won, message) {
   endModal.classList.add("active");
 }
 
+function openCyberTips() {
+  if (!tipsModal) return;
+  tipsModal.classList.add("active");
+  playSound("click");
+}
+
+function closeCyberTips() {
+  if (!tipsModal) return;
+  tipsModal.classList.remove("active");
+  playSound("click");
+}
+
 function loop() {
   if (!running || paused || questionOpen || passwordOpen) {
     animationId = null;
@@ -1789,8 +1852,11 @@ function restartGame() {
     reviveModal,
     learningModal,
     endModal,
-    loadingModal
-  ].forEach(modal => modal.classList.remove("active"));
+    loadingModal,
+    tipsModal
+  ].forEach(modal => {
+    if (modal) modal.classList.remove("active");
+  });
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1817,8 +1883,11 @@ function exitGame() {
     reviveModal,
     learningModal,
     endModal,
-    loadingModal
-  ].forEach(modal => modal.classList.remove("active"));
+    loadingModal,
+    tipsModal
+  ].forEach(modal => {
+    if (modal) modal.classList.remove("active");
+  });
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1842,6 +1911,11 @@ document.addEventListener("keydown", event => {
   }
 
   if (keyPressed === "escape") {
+    if (tipsModal && tipsModal.classList.contains("active")) {
+      closeCyberTips();
+      return;
+    }
+
     paused ? resumeGame(true) : pauseGame();
     return;
   }
@@ -1852,7 +1926,8 @@ document.addEventListener("keydown", event => {
     !paused &&
     !reviveModal.classList.contains("active") &&
     !startModal.classList.contains("active") &&
-    !loadingModal.classList.contains("active")
+    !loadingModal.classList.contains("active") &&
+    !tipsModal.classList.contains("active")
   ) {
     keys[keyPressed] = true;
   }
@@ -1870,9 +1945,11 @@ window.addEventListener("visibilitychange", () => {
 
 passwordInput.addEventListener("input", updatePasswordChecks);
 passwordConfirmInput.addEventListener("input", updatePasswordChecks);
+registerPassword.addEventListener("input", updateRegisterStrength);
 
 restoreLogin();
 resetState();
+updateRegisterStrength();
 
 fishImg.onload = draw;
 playerImg.onload = draw;
