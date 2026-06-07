@@ -104,6 +104,7 @@ doorOpenImg.src = DOOR_OPEN_SRC;
 
 const audio = {};
 let soundOn = localStorage.getItem("clickbaitSound") !== "off";
+let audioUnlocked = false;
 
 for (const [name, src] of Object.entries(SOUNDS)) {
   audio[name] = new Audio(src);
@@ -136,6 +137,8 @@ const reviveModal = $("reviveModal");
 const learningModal = $("learningModal");
 const endModal = $("endModal");
 const tipsModal = $("tipsModal");
+const finalAnimationModal = $("finalAnimationModal");
+const finalAnimationVideo = $("finalAnimationVideo");
 
 const qTitle = $("questionTitle");
 const qText = $("questionText");
@@ -173,12 +176,7 @@ const questions = [
   {
     title: "Door 1: School Account Warning",
     text: "Your school account will be permanently deleted in 2 hours. The sender is support-schoolservices@gmail.com. What should you do?",
-    answers: [
-      "Click quickly before losing access",
-      "Ignore warning signs because it mentions school",
-      "Check with your school or official platform first",
-      "Reply asking if the email is legitimate"
-    ],
+    answers: ["Click quickly before losing access", "Ignore warning signs because it mentions school", "Check with your school or official platform first", "Reply asking if the email is legitimate"],
     correct: 2,
     hint: "Check the sender and verify through the official school system.",
     lesson: "Urgent account warnings can be phishing. Always verify through official school platforms."
@@ -186,12 +184,7 @@ const questions = [
   {
     title: "Door 2: Free Gaming Download",
     text: "A gaming website says FREE PREMIUM SKINS – DOWNLOAD NOW and immediately starts downloading a file. What should you do?",
-    answers: [
-      "Run the file immediately",
-      "Delete the file and leave the site",
-      "Share with friends first",
-      "Disable antivirus and continue"
-    ],
+    answers: ["Run the file immediately", "Delete the file and leave the site", "Share with friends first", "Disable antivirus and continue"],
     correct: 1,
     hint: "Unexpected downloads are risky.",
     lesson: "Unknown downloads can contain malware. Delete them and leave the site."
@@ -199,12 +192,7 @@ const questions = [
   {
     title: "Door 3: Public WiFi",
     text: "You connect to free public WiFi and need to log into an important account. What is safest?",
-    answers: [
-      "Log in normally",
-      "Wait until using a trusted connection",
-      "Use easier passwords",
-      "Turn brightness down before logging in"
-    ],
+    answers: ["Log in normally", "Wait until using a trusted connection", "Use easier passwords", "Turn brightness down before logging in"],
     correct: 1,
     hint: "Think about whether the network is trusted.",
     lesson: "Public WiFi can be unsafe for important accounts. Use a trusted connection."
@@ -212,12 +200,7 @@ const questions = [
   {
     title: "Door 4: Fake Instagram Page",
     text: "URL: secure-instagram-login.verify-account.net. The page looks identical to Instagram. What is the strongest warning sign?",
-    answers: [
-      "It uses dark mode",
-      "It loaded quickly",
-      "The web address is unusual",
-      "It asked for your username"
-    ],
+    answers: ["It uses dark mode", "It loaded quickly", "The web address is unusual", "It asked for your username"],
     correct: 2,
     hint: "A fake page can look real. Check the URL.",
     lesson: "The web address is one of the biggest warning signs of a fake login page."
@@ -225,12 +208,7 @@ const questions = [
   {
     title: "Door 5: Unexpected Link",
     text: "A friend sends an unknown link. It requests login, then payment information. When should you stop?",
-    answers: [
-      "After payment request",
-      "After login request",
-      "After receiving unexpected link",
-      "After account gets locked"
-    ],
+    answers: ["After payment request", "After login request", "After receiving unexpected link", "After account gets locked"],
     correct: 2,
     hint: "The safest time to stop is before clicking.",
     lesson: "Stop when you receive an unexpected link. Verify with the person first."
@@ -238,12 +216,7 @@ const questions = [
   {
     title: "Door 6: Password Strength",
     text: "Password A: BlueFoxTrainCoffeePizza99. Password B: G!7$qL#2z@8. Which is better security practice?",
-    answers: [
-      "Password A because it is longer and unique",
-      "Password B because symbols always mean stronger security",
-      "Both are equally secure",
-      "Neither because passwords should never contain words"
-    ],
+    answers: ["Password A because it is longer and unique", "Password B because symbols always mean stronger security", "Both are equally secure", "Neither because passwords should never contain words"],
     correct: 0,
     hint: "Length and uniqueness matter.",
     lesson: "Long unique passphrases can be strong and easier to remember."
@@ -251,12 +224,7 @@ const questions = [
   {
     title: "Door 7: Verification Code",
     text: "A close friend asks you to receive a verification code for them. The account looks genuine. What is safest?",
-    answers: [
-      "Help because you know them personally",
-      "Send only part of the code",
-      "Refuse because verification codes should stay private",
-      "Ask them to promise not to misuse it"
-    ],
+    answers: ["Help because you know them personally", "Send only part of the code", "Refuse because verification codes should stay private", "Ask them to promise not to misuse it"],
     correct: 2,
     hint: "A verification code is like an account key.",
     lesson: "Never share verification codes. Even real-looking accounts can be hacked."
@@ -264,12 +232,7 @@ const questions = [
   {
     title: "Door 8: QR Code Login",
     text: "A QR website uses HTTPS, looks professional, asks for school login details, and the URL is unrelated to your school. What is the greatest concern?",
-    answers: [
-      "QR codes are always dangerous",
-      "Professional design",
-      "Unrelated website requesting credentials",
-      "HTTPS encryption"
-    ],
+    answers: ["QR codes are always dangerous", "Professional design", "Unrelated website requesting credentials", "HTTPS encryption"],
     correct: 2,
     hint: "HTTPS does not always mean the site is trusted.",
     lesson: "A fake website can still use HTTPS. Check if the site belongs to your school."
@@ -277,12 +240,7 @@ const questions = [
   {
     title: "Door 9: Suspicious Link Clicked",
     text: "You accidentally click a suspicious link. Nothing downloads and nothing happens. What is the BEST response?",
-    answers: [
-      "Ignore it because nothing happened",
-      "Restart device immediately",
-      "Monitor activity and avoid entering information afterward",
-      "Factory reset device"
-    ],
+    answers: ["Ignore it because nothing happened", "Restart device immediately", "Monitor activity and avoid entering information afterward", "Factory reset device"],
     correct: 2,
     hint: "Nothing visible does not always mean safe.",
     lesson: "After clicking a suspicious link, avoid entering details and monitor your accounts."
@@ -290,12 +248,7 @@ const questions = [
   {
     title: "Door 10: Shared Computer",
     text: "You use a school computer. After logging out, the browser asks Save password? What is safest?",
-    answers: [
-      "Save because computer requires login already",
-      "Save temporarily",
-      "Decline saving credentials on shared devices",
-      "Save if browser looks trustworthy"
-    ],
+    answers: ["Save because computer requires login already", "Save temporarily", "Decline saving credentials on shared devices", "Save if browser looks trustworthy"],
     correct: 2,
     hint: "Other people may use the device later.",
     lesson: "Never save passwords on shared computers."
@@ -303,12 +256,7 @@ const questions = [
   {
     title: "Door 11: School Portal Email",
     text: "A school portal email asks you to sign in again. The sender matches previous emails and the link opens the correct domain. What should you do?",
-    answers: [
-      "Log in immediately because domain is correct",
-      "Ignore the email completely",
-      "Access the portal manually rather than through the email link",
-      "Reply asking whether it is legitimate"
-    ],
+    answers: ["Log in immediately because domain is correct", "Ignore the email completely", "Access the portal manually rather than through the email link", "Reply asking whether it is legitimate"],
     correct: 2,
     hint: "Manual access is safer than email links.",
     lesson: "Open important portals manually instead of clicking email links."
@@ -316,12 +264,7 @@ const questions = [
   {
     title: "Door 12: Delivery Message",
     text: "You order gaming equipment. Ten minutes later, a delivery message has correct branding, order number, first name, and HTTPS link. Best action?",
-    answers: [
-      "Enter details because information matches recent activity",
-      "Click link but avoid entering payment details",
-      "Open retailer website independently and verify delivery information there",
-      "Trust message because scammers cannot know order numbers"
-    ],
+    answers: ["Enter details because information matches recent activity", "Click link but avoid entering payment details", "Open retailer website independently and verify delivery information there", "Trust message because scammers cannot know order numbers"],
     correct: 2,
     hint: "Scammers can sometimes know real order details.",
     lesson: "Realistic details do not prove safety. Verify through the official retailer site."
@@ -329,12 +272,7 @@ const questions = [
   {
     title: "Door 13: Safe Charging",
     text: "Your phone battery is low at an event. Option A: free USB cable already connected. Option B: power socket only. Option C: staff charger. What is safest?",
-    answers: [
-      "Option A because charging is charging",
-      "Option B",
-      "Option C because staff are trusted",
-      "Use whichever charges fastest"
-    ],
+    answers: ["Option A because charging is charging", "Option B", "Option C because staff are trusted", "Use whichever charges fastest"],
     correct: 1,
     hint: "USB cables can transfer data.",
     lesson: "A power socket is safer than an unknown USB cable."
@@ -342,12 +280,7 @@ const questions = [
   {
     title: "Door 14: Urgency Trick",
     text: "Why do many phishing attacks create urgency?",
-    answers: [
-      "Faster internet connections require speed",
-      "Urgency increases mistakes and reduces critical thinking",
-      "Messages expire automatically",
-      "Attackers cannot send longer messages"
-    ],
+    answers: ["Faster internet connections require speed", "Urgency increases mistakes and reduces critical thinking", "Messages expire automatically", "Attackers cannot send longer messages"],
     correct: 1,
     hint: "Urgency makes people rush.",
     lesson: "Urgency reduces careful thinking. Scammers want fast mistakes."
@@ -355,12 +288,7 @@ const questions = [
   {
     title: "Door 15: Spam Filter Trust",
     text: "An email has correct branding, correct domain spelling, expected timing and passes spam filters. Which assumption is MOST dangerous?",
-    answers: [
-      "Thinking branding proves legitimacy",
-      "Thinking spam filters catch everything",
-      "Thinking timing matters",
-      "Thinking security updates exist"
-    ],
+    answers: ["Thinking branding proves legitimacy", "Thinking spam filters catch everything", "Thinking timing matters", "Thinking security updates exist"],
     correct: 1,
     hint: "Spam filters help, but they are not perfect.",
     lesson: "Spam filters do not catch everything. You still need to check carefully."
@@ -415,25 +343,59 @@ let correctAnswers = 0;
 let wrongAnswers = 0;
 let revivesUsed = 0;
 
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  audioUnlocked = true;
+
+  for (const sound of Object.values(audio)) {
+    sound.volume = sound === audio.bg ? 0.22 : 0.8;
+    sound.play()
+      .then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+      })
+      .catch(() => {});
+  }
+}
+
 function playSound(name) {
   if (!soundOn) return;
+
   const sound = audio[name];
-  if (!sound) return;
+
+  if (!sound) {
+    console.warn("Sound not found:", name);
+    return;
+  }
 
   try {
-    sound.currentTime = 0;
-    sound.play().catch(() => {});
-  } catch {}
+    const clone = sound.cloneNode();
+    clone.volume = sound.volume || 0.8;
+    clone.play().catch(error => {
+      console.warn("Sound play failed:", name, error.message);
+    });
+  } catch (error) {
+    console.warn("Sound error:", name, error.message);
+  }
 }
 
 function startMusic() {
   if (!soundOn) return;
-  audio.bg.play().catch(() => {});
+
+  audio.bg.volume = 0.22;
+  audio.bg.loop = true;
+
+  audio.bg.play().catch(error => {
+    console.warn("Background music blocked or missing:", error.message);
+  });
 }
 
 function stopMusic() {
-  audio.bg.pause();
-  audio.bg.currentTime = 0;
+  try {
+    audio.bg.pause();
+    audio.bg.currentTime = 0;
+  } catch {}
 }
 
 function toggleSound() {
@@ -1315,29 +1277,12 @@ function openPasswordDoor(door) {
 function getPasswordIssues(password, confirmPassword = "") {
   const issues = [];
 
-  if (password.length < 8) {
-    issues.push("Add at least 8 characters.");
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    issues.push("Add one uppercase letter.");
-  }
-
-  if (!/[a-z]/.test(password)) {
-    issues.push("Add one lowercase letter.");
-  }
-
-  if (!/[0-9]/.test(password)) {
-    issues.push("Add one number.");
-  }
-
-  if (!/[^A-Za-z0-9]/.test(password)) {
-    issues.push("Add one special character.");
-  }
-
-  if (password !== confirmPassword) {
-    issues.push("Passwords do not match.");
-  }
+  if (password.length < 8) issues.push("Add at least 8 characters.");
+  if (!/[A-Z]/.test(password)) issues.push("Add one uppercase letter.");
+  if (!/[a-z]/.test(password)) issues.push("Add one lowercase letter.");
+  if (!/[0-9]/.test(password)) issues.push("Add one number.");
+  if (!/[^A-Za-z0-9]/.test(password)) issues.push("Add one special character.");
+  if (password !== confirmPassword) issues.push("Passwords do not match.");
 
   return issues;
 }
@@ -1384,15 +1329,15 @@ function submitPasswordDoor() {
   score += 30;
   cyberCoins++;
   currentDoor.unlocked = true;
-  currentDoor.lockedBehind = false;
+  currentDoor.lockedBehind = true;
 
   finalPasswordLocked = true;
   enemyFrozenUntil = Date.now() + 999999;
   enemyGhost = false;
   enemyPath = [];
 
-  passwordFeedback.textContent = "Strong password confirmed. Final door unlocked. The fish cannot follow you.";
-  toast.textContent = "Strong passwords protect accounts. Run to EXIT and lock the fish out!";
+  passwordFeedback.textContent = "Strong password confirmed. Final door locked. The fish cannot follow you.";
+  toast.textContent = "Strong password accepted. Final escape animation starting.";
 
   playSound("lock");
   playSound("open");
@@ -1405,8 +1350,39 @@ function submitPasswordDoor() {
     passwordOpen = false;
     currentDoor = null;
     clearKeys();
-    resumeGame(false);
-  }, 1000);
+    playFinalAnimation();
+  }, 800);
+}
+
+function playFinalAnimation() {
+  running = false;
+  paused = false;
+  clearKeys();
+
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+
+  stopMusic();
+
+  finalAnimationModal.classList.add("active");
+
+  finalAnimationVideo.currentTime = 0;
+  finalAnimationVideo.muted = !soundOn;
+
+  finalAnimationVideo.play().catch(error => {
+    console.warn("Final animation play failed:", error.message);
+    setTimeout(() => {
+      finalAnimationModal.classList.remove("active");
+      endGame(true);
+    }, 3000);
+  });
+
+  finalAnimationVideo.onended = () => {
+    finalAnimationModal.classList.remove("active");
+    endGame(true);
+  };
 }
 
 function moveEnemy() {
@@ -1475,26 +1451,11 @@ function checkCaught() {
 }
 
 function checkWin() {
-  if (doors.every(door => door.unlocked) && dist(center(player, player.size), cellCenter(EXIT)) < 30) {
-    endGame(true);
-  }
+  return;
 }
 
 function checkFinalDoorRelock() {
-  if (!doors) return;
-
-  const finalDoor = doors[doors.length - 1];
-
-  if (!finalDoor || !finalDoor.unlocked || finalDoor.lockedBehind) return;
-
-  const playerCell = cellOf(player, player.size);
-
-  if (playerCell.r < finalDoor.r || dist(center(player, player.size), cellCenter(EXIT)) < 35) {
-    finalDoor.lockedBehind = true;
-    toast.textContent = "Final door locked behind you. The fish is trapped outside.";
-    playSound("lock");
-    draw();
-  }
+  return;
 }
 
 function getProgressDoorNumber() {
@@ -1719,7 +1680,6 @@ function loop() {
   checkCoins();
   checkDoor();
   checkCaught();
-  checkFinalDoorRelock();
   checkWin();
   updateHud();
   draw();
@@ -1739,6 +1699,7 @@ function startGame() {
     return;
   }
 
+  unlockAudio();
   playSound("click");
 
   startModal.classList.remove("active");
@@ -1822,7 +1783,8 @@ function resumeGame(closePause = true) {
     endModal.classList.contains("active") ||
     questionOpen ||
     passwordOpen ||
-    reviveModal.classList.contains("active")
+    reviveModal.classList.contains("active") ||
+    finalAnimationModal.classList.contains("active")
   ) {
     return;
   }
@@ -1853,10 +1815,16 @@ function restartGame() {
     learningModal,
     endModal,
     loadingModal,
-    tipsModal
+    tipsModal,
+    finalAnimationModal
   ].forEach(modal => {
     if (modal) modal.classList.remove("active");
   });
+
+  if (finalAnimationVideo) {
+    finalAnimationVideo.pause();
+    finalAnimationVideo.currentTime = 0;
+  }
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1884,10 +1852,16 @@ function exitGame() {
     learningModal,
     endModal,
     loadingModal,
-    tipsModal
+    tipsModal,
+    finalAnimationModal
   ].forEach(modal => {
     if (modal) modal.classList.remove("active");
   });
+
+  if (finalAnimationVideo) {
+    finalAnimationVideo.pause();
+    finalAnimationVideo.currentTime = 0;
+  }
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1905,6 +1879,12 @@ function exitGame() {
 
 document.addEventListener("keydown", event => {
   const keyPressed = event.key.toLowerCase();
+
+  if (passwordOpen && keyPressed === "enter") {
+    event.preventDefault();
+    submitPasswordDoor();
+    return;
+  }
 
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(keyPressed)) {
     event.preventDefault();
@@ -1927,7 +1907,8 @@ document.addEventListener("keydown", event => {
     !reviveModal.classList.contains("active") &&
     !startModal.classList.contains("active") &&
     !loadingModal.classList.contains("active") &&
-    !tipsModal.classList.contains("active")
+    !tipsModal.classList.contains("active") &&
+    !finalAnimationModal.classList.contains("active")
   ) {
     keys[keyPressed] = true;
   }
