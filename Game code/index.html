@@ -104,7 +104,7 @@
                 <li>Wrong answers make the fish faster and stronger.</li>
                 <li>The fish buff lets it pass through walls for a short time.</li>
                 <li>The final door needs a strong confirmed password.</li>
-                <li>The final door locks behind you after you escape.</li>
+                <li>The final animation plays after the final password is accepted.</li>
               </ul>
             </div>
           </div>
@@ -331,6 +331,19 @@
         </div>
 
         <button class="restart-btn" onclick="closeCyberTips()">Back to Result</button>
+      </div>
+    </div>
+
+    <div id="finalAnimationModal" class="modal">
+      <div class="final-video-screen">
+        <video id="finalAnimationVideo" class="final-video" preload="auto">
+          <source src="assets/final-animation.mp4" type="video/mp4">
+        </video>
+
+        <div class="final-video-text">
+          <h2>Maze Escaped</h2>
+          <p>The strong password locked the fish out.</p>
+        </div>
       </div>
     </div>
 
