@@ -6,12 +6,17 @@
 <title>ClickBait - Cyber Maze</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 <div class="wrapper">
+
   <div class="topbar">
-    <div>
-      <h1>ClickBait</h1>
-      <p class="subtitle">Escape the maze. Learn cyber safety. Survive the angler fish.</p>
+    <div class="brand-box">
+      <img src="assets/game-thumbnail.jpg" alt="ClickBait Logo" class="site-logo">
+      <div>
+        <h1>ClickBait</h1>
+        <p class="subtitle">Escape the maze. Learn cyber safety. Survive the angler fish.</p>
+      </div>
     </div>
   </div>
 
@@ -33,9 +38,14 @@
 
     <div id="startModal" class="modal active">
       <div class="modal-card intro-card">
+
         <div id="setupPage1" class="setup-page active">
           <h2>Before You Play</h2>
-          <p class="small-text">This game teaches cybersecurity safety through a maze challenge. Please read and accept the safety rules before continuing.</p>
+          <p class="small-text">
+            This game teaches cybersecurity safety through a maze challenge.
+            Please read and accept the safety rules before continuing.
+          </p>
+
           <div class="panel-grid">
             <div class="info-panel">
               <h3>Terms & Conditions</h3>
@@ -47,6 +57,7 @@
                 <li>Game features may be improved later.</li>
               </ul>
             </div>
+
             <div class="info-panel">
               <h3>Parental Control</h3>
               <ul>
@@ -58,16 +69,19 @@
               </ul>
             </div>
           </div>
+
           <div class="accept-box">
             <label><input type="checkbox" id="acceptTerms"> I accept the Terms & Conditions.</label>
             <label><input type="checkbox" id="acceptParents"> I accept the Parental/Safety rules.</label>
           </div>
+
           <p id="page1Warning" class="warning-text"></p>
           <button class="restart-btn" onclick="goSetupPage(2)">Continue</button>
         </div>
 
         <div id="setupPage2" class="setup-page">
           <h2>How to Play + Game Rules</h2>
+
           <div class="panel-grid">
             <div class="info-panel">
               <h3>How to Play</h3>
@@ -76,12 +90,13 @@
                 <li>Pause using ESC.</li>
                 <li>Only the next locked door is shown.</li>
                 <li>Answer cyber questions to unlock doors.</li>
-                <li>Correct answers give score and Cyber Coins.</li>
+                <li>Correct answers give Cyber Coins.</li>
+                <li>Random coins only increase score.</li>
                 <li>Hints cost 1 Cyber Coin.</li>
-                <li>3 Cyber Coins can revive you.</li>
                 <li>You can revive maximum 2 times only.</li>
               </ul>
             </div>
+
             <div class="info-panel">
               <h3>Special Rules</h3>
               <ul>
@@ -92,10 +107,11 @@
                 <li>Wrong answers make the fish faster and stronger.</li>
                 <li>Main level final door needs a strong password.</li>
                 <li>Cyber Expert unlocks a hidden level.</li>
-                <li>Hidden level has 10 harder cyber doors.</li>
+                <li>Hidden level has harder questions and faster fish.</li>
               </ul>
             </div>
           </div>
+
           <div class="panel-grid">
             <div class="info-panel">
               <h3>Cyber Tips</h3>
@@ -108,6 +124,7 @@
                 <li>Do not save passwords on shared computers.</li>
               </ul>
             </div>
+
             <div class="info-panel">
               <h3>Badges</h3>
               <ul>
@@ -119,6 +136,7 @@
               </ul>
             </div>
           </div>
+
           <div class="button-row">
             <button onclick="goSetupPage(1)">Back</button>
             <button onclick="goSetupPage(3)">Continue</button>
@@ -127,11 +145,16 @@
 
         <div id="setupPage3" class="setup-page">
           <h2>Login & Start</h2>
+
           <div class="login-start-layout">
             <div class="login-preview">
               <img src="assets/game-thumbnail.jpg" alt="ClickBait Game Thumbnail">
               <h3>ClickBait Cyber Maze</h3>
-              <p>Learn cyber safety by escaping doors, avoiding phishing traps, and surviving the angler fish.</p>
+              <p>
+                Learn cyber safety by escaping doors, avoiding phishing traps,
+                and surviving the angler fish.
+              </p>
+
               <div class="mini-rules">
                 <span>16 Main Doors</span>
                 <span>10 Hidden Doors</span>
@@ -139,33 +162,49 @@
                 <span>2 Revives Max</span>
               </div>
             </div>
+
             <div class="auth-box professional-auth">
               <div id="loginPanel">
                 <h3>Player Login</h3>
                 <p class="auth-subtitle">Login to save your best score and time.</p>
+
                 <input id="loginUsername" class="text-input" type="text" placeholder="Username">
                 <input id="loginPassword" class="text-input" type="password" placeholder="Password">
+
                 <button class="restart-btn" onclick="loginUser()">Login</button>
                 <button class="link-btn" onclick="showRegister()">Create new account</button>
               </div>
+
               <div id="registerPanel" class="hidden">
                 <h3>Create Player Account</h3>
                 <p class="auth-subtitle">Use a strong password to learn good cyber habits.</p>
+
                 <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
                 <input id="registerPassword" class="text-input" type="password" placeholder="Choose strong password">
-                <div id="registerStrength" class="register-strength">Password needs 8 characters, uppercase, lowercase, number, and special character.</div>
+
+                <div id="registerStrength" class="register-strength">
+                  Password needs 8 characters, uppercase, lowercase, number, and special character.
+                </div>
+
                 <button class="restart-btn" onclick="registerUser()">Register</button>
                 <button class="link-btn" onclick="showLogin()">Back to login</button>
               </div>
-              <div id="loggedInBox" class="logged-in hidden">Logged in as <strong id="loggedInName"></strong><button class="mini-btn" onclick="logoutUser()">Logout</button></div>
+
+              <div id="loggedInBox" class="logged-in hidden">
+                Logged in as <strong id="loggedInName"></strong>
+                <button class="mini-btn" onclick="logoutUser()">Logout</button>
+              </div>
+
               <p id="authMessage" class="warning-text"></p>
             </div>
           </div>
+
           <div class="button-row">
             <button onclick="goSetupPage(2)">Back</button>
             <button onclick="startGame()">Start Game</button>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -173,13 +212,20 @@
       <div class="loading-fullscreen">
         <img src="assets/thumbnail-screen.png" alt="Cyber Maze Loading Screen" class="loading-bg-image">
         <div class="loading-overlay"></div>
+
         <div class="loading-content">
           <h2 id="loadingTitle">Entering Cyber Maze...</h2>
           <p class="loading-subtitle">Prepare your mind. The phishing fish is already inside.</p>
+
           <div class="loading-status-box">
             <p id="loadingText">Preparing doors...</p>
-            <div class="loading-bar-pro"><div id="loadingFill"></div></div>
-            <div class="loading-tips"><span>Cyber Tip:</span> Think before you click. Real danger often looks safe.</div>
+            <div class="loading-bar-pro">
+              <div id="loadingFill"></div>
+            </div>
+            <div class="loading-tips">
+              <span>Cyber Tip:</span>
+              Think before you click. Real danger often looks safe.
+            </div>
           </div>
         </div>
       </div>
@@ -223,11 +269,16 @@
     <div id="passwordModal" class="modal">
       <div class="modal-card">
         <h2>Final Door: Lock the Fish Out</h2>
-        <p class="small-text">Type any password first. The door only accepts it if it is strong and confirmed.</p>
+        <p class="small-text">
+          Type any password first. The door only accepts it if it is strong and confirmed.
+        </p>
+
         <input id="passwordInput" class="password-input" type="text" placeholder="Create a strong password">
         <input id="passwordConfirmInput" class="password-input" type="text" placeholder="Confirm password">
+
         <ul id="passwordChecks" class="password-checks"></ul>
         <p id="passwordFeedback"></p>
+
         <button class="restart-btn" onclick="submitPasswordDoor()">Check Password</button>
       </div>
     </div>
@@ -246,8 +297,14 @@
     <div id="hiddenLevelModal" class="modal">
       <div class="modal-card hidden-level-card">
         <h2>Secret Level Unlocked</h2>
-        <p class="small-text">You earned the <strong>Cyber Expert</strong> badge. A hidden maze has appeared.</p>
-        <p class="small-text">This level has 10 harder cyber doors, a confusing map, and a faster fish.</p>
+        <p class="small-text">
+          You earned the <strong>Cyber Expert</strong> badge. A hidden maze has appeared.
+        </p>
+        <p class="small-text">
+          This level has 10 harder cyber doors, a confusing map, no wrong-answer respawn,
+          and a much faster fish.
+        </p>
+
         <div class="button-row">
           <button onclick="startHiddenLevel()">Yes, Enter Hidden Level</button>
           <button onclick="skipHiddenLevel()">No, Show Result</button>
@@ -259,9 +316,11 @@
       <div class="modal-card">
         <h2 id="endTitle">Final Result</h2>
         <div id="endText" class="small-text"></div>
+
         <div class="button-row">
           <button onclick="restartGame()">Restart Level</button>
           <button onclick="openCyberTips()">Cyber Safety Tips</button>
+          <button onclick="openFeedbackForm()">Player Feedback</button>
           <button onclick="exitGame()">Exit Game</button>
         </div>
       </div>
@@ -270,7 +329,10 @@
     <div id="tipsModal" class="modal">
       <div class="modal-card cyber-tips-card">
         <h2>Cyber Safety Tips</h2>
-        <p class="small-text">These tips are for young players aged 11–16. Use them in school, gaming, and social media.</p>
+        <p class="small-text">
+          These tips are for young players aged 11–16. Use them in school, gaming, and social media.
+        </p>
+
         <div class="tips-grid">
           <div>1. Think before clicking any link.</div>
           <div>2. Check the website address before logging in.</div>
@@ -288,7 +350,117 @@
           <div>14. Report suspicious messages instead of replying to them.</div>
           <div>15. When unsure, stop, check, and ask for help.</div>
         </div>
+
         <button class="restart-btn" onclick="closeCyberTips()">Back to Result</button>
+      </div>
+    </div>
+
+    <div id="feedbackModal" class="modal">
+      <div class="modal-card feedback-card">
+        <h2>Player Feedback Form</h2>
+
+        <p class="small-text">
+          You survived the dungeon… or maybe the fish had dinner.
+          Either way, we need your help. Tell us what you thought so we can make the game more fun,
+          more scary, and better at teaching cyber safety.
+        </p>
+
+        <div class="feedback-form">
+          <label>1. How old are you?</label>
+          <div class="option-row">
+            <label><input type="radio" name="age"> 10 or under</label>
+            <label><input type="radio" name="age"> 11-16</label>
+            <label><input type="radio" name="age"> Above 16</label>
+          </div>
+
+          <label>2. Before playing, how much did you know about phishing and online scams?</label>
+          <div class="option-row">
+            <label><input type="radio" name="knowledge"> I knew a lot</label>
+            <label><input type="radio" name="knowledge"> I knew a little</label>
+            <label><input type="radio" name="knowledge"> I had heard of it</label>
+            <label><input type="radio" name="knowledge"> I had no idea what it meant</label>
+          </div>
+
+          <label>3. How fun was the game?</label>
+          <div class="option-row">
+            <label><input type="radio" name="fun"> Super fun</label>
+            <label><input type="radio" name="fun"> Pretty fun</label>
+            <label><input type="radio" name="fun"> It was okay</label>
+            <label><input type="radio" name="fun"> Not that fun</label>
+            <label><input type="radio" name="fun"> The fish ruined my day</label>
+          </div>
+
+          <label>4. What made you want to keep playing?</label>
+          <div class="option-row">
+            <label><input type="checkbox"> Escaping the maze</label>
+            <label><input type="checkbox"> Unlocking doors</label>
+            <label><input type="checkbox"> The fish chasing me</label>
+            <label><input type="checkbox"> Getting Cyber Coins</label>
+            <label><input type="checkbox"> Trying to get a better badge</label>
+            <label><input type="checkbox"> The final password door</label>
+            <label><input type="checkbox"> The hidden level</label>
+            <label><input type="checkbox"> Nothing really</label>
+          </div>
+          <input class="feedback-input" type="text" placeholder="Other...">
+
+          <label>5. When you got a question wrong, did the fish getting stronger make you think more carefully next time?</label>
+          <div class="option-row">
+            <label><input type="radio" name="fishStrong"> Yes</label>
+            <label><input type="radio" name="fishStrong"> Sometimes</label>
+            <label><input type="radio" name="fishStrong"> Not really</label>
+            <label><input type="radio" name="fishStrong"> I just panicked</label>
+            <label><input type="radio" name="fishStrong"> I didn’t notice</label>
+          </div>
+
+          <label>6. Did the cyber questions feel like things that could happen online in real life?</label>
+          <div class="option-row">
+            <label><input type="radio" name="realLife"> Yes, definitely</label>
+            <label><input type="radio" name="realLife"> Some of them</label>
+            <label><input type="radio" name="realLife"> Not really</label>
+            <label><input type="radio" name="realLife"> I’m not sure</label>
+          </div>
+
+          <label>7. After playing, do you feel better at spotting phishing or scam messages?</label>
+          <div class="option-row">
+            <label><input type="radio" name="better"> Yes, much better</label>
+            <label><input type="radio" name="better"> A little better</label>
+            <label><input type="radio" name="better"> Not sure</label>
+            <label><input type="radio" name="better"> No</label>
+          </div>
+
+          <label>8. Did the learning popups help, or did you ignore them like Terms and Conditions?</label>
+          <div class="option-row">
+            <label><input type="radio" name="popup"> They helped a lot</label>
+            <label><input type="radio" name="popup"> They helped a little</label>
+            <label><input type="radio" name="popup"> I read some of them</label>
+            <label><input type="radio" name="popup"> I skipped them</label>
+            <label><input type="radio" name="popup"> I didn’t notice them</label>
+          </div>
+
+          <label>9. After playing, would you make your own passwords stronger?</label>
+          <div class="option-row">
+            <label><input type="radio" name="passwordBetter"> Yes</label>
+            <label><input type="radio" name="passwordBetter"> Maybe</label>
+            <label><input type="radio" name="passwordBetter"> Probably not</label>
+            <label><input type="radio" name="passwordBetter"> My password is already unbreakable… I think</label>
+          </div>
+
+          <label>10. What was your favourite part of the game?</label>
+          <textarea class="feedback-textarea"></textarea>
+
+          <label>11. What was the most annoying part of the game?</label>
+          <textarea class="feedback-textarea"></textarea>
+
+          <label>12. If you could add one new thing to the game, what would it be?</label>
+          <textarea class="feedback-textarea"></textarea>
+
+          <p id="feedbackThanks" class="small-text"></p>
+
+          <div class="button-row">
+            <button onclick="submitFeedbackForm()">Submit Feedback</button>
+            <button onclick="closeFeedbackForm()">Back</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -297,17 +469,20 @@
         <video id="finalAnimationVideo" class="final-video" preload="auto">
           <source src="assets/final-animation.mp4" type="video/mp4">
         </video>
+
         <div class="final-video-text">
           <h2>Maze Escaped</h2>
           <p>The strong password locked the fish out.</p>
         </div>
       </div>
     </div>
+
   </div>
 
   <div id="toast">Accept the rules, login or register, then start the game.</div>
   <div class="controls">Move: WASD / Arrow Keys | Pause: ESC | Final password: Press Enter</div>
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>
