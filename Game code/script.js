@@ -8,7 +8,7 @@ const MAX_REVIVES = 2;
 const HINT_COST = 1;
 
 const MAIN_ENEMY_SPEED = 0.82;
-const HIDDEN_ENEMY_SPEED = 1.35;
+const HIDDEN_ENEMY_SPEED = 1.75;
 const MAIN_QUESTION_TIME = 18;
 const HIDDEN_QUESTION_TIME = 14;
 const PLAYER_SPEED = 2.45;
@@ -102,24 +102,11 @@ const MAIN_COIN_CELLS = [
 ];
 
 const HIDDEN_COIN_CELLS = [
-  { c: 3, r: 15 },
-  { c: 6, r: 15 },
-  { c: 9, r: 13 },
-  { c: 11, r: 11 },
-  { c: 10, r: 9 },
-  { c: 7, r: 7 },
-  { c: 9, r: 3 },
-  { c: 13, r: 1 },
-  { c: 17, r: 1 },
-  { c: 19, r: 3 },
-  { c: 19, r: 7 },
-  { c: 17, r: 11 },
-  { c: 19, r: 15 },
-  { c: 21, r: 13 },
-  { c: 23, r: 11 },
-  { c: 25, r: 9 },
-  { c: 27, r: 5 },
-  { c: 27, r: 3 }
+  { c: 3, r: 15 }, { c: 6, r: 15 }, { c: 9, r: 13 }, { c: 11, r: 11 },
+  { c: 10, r: 9 }, { c: 7, r: 7 }, { c: 9, r: 3 }, { c: 13, r: 1 },
+  { c: 17, r: 1 }, { c: 19, r: 3 }, { c: 19, r: 7 }, { c: 17, r: 11 },
+  { c: 19, r: 15 }, { c: 21, r: 13 }, { c: 23, r: 11 }, { c: 25, r: 9 },
+  { c: 27, r: 5 }, { c: 27, r: 3 }
 ];
 
 const FISH_SRC = "assets/enemy-fish.png";
@@ -405,6 +392,8 @@ const learningModal = $("learningModal");
 const hiddenLevelModal = $("hiddenLevelModal");
 const endModal = $("endModal");
 const tipsModal = $("tipsModal");
+const feedbackModal = $("feedbackModal");
+const feedbackThanks = $("feedbackThanks");
 const finalAnimationModal = $("finalAnimationModal");
 const finalAnimationVideo = $("finalAnimationVideo");
 
@@ -502,18 +491,14 @@ let hiddenCompleted = false;
 
 function unlockAudio() {
   if (audioUnlocked) return;
-
   audioUnlocked = true;
 
   for (const sound of Object.values(audio)) {
     sound.volume = sound === audio.bg ? 0.22 : 0.8;
-
-    sound.play()
-      .then(() => {
-        sound.pause();
-        sound.currentTime = 0;
-      })
-      .catch(() => {});
+    sound.play().then(() => {
+      sound.pause();
+      sound.currentTime = 0;
+    }).catch(() => {});
   }
 }
 
@@ -941,7 +926,6 @@ function resetState(keepLevel = false) {
 
   coins = currentCoinCells.map(cell => {
     const p = cellCenter(cell);
-
     return {
       ...cell,
       x: p.x - 7,
@@ -1378,7 +1362,12 @@ function answerQuestion(selected, question, timedOut) {
 
     buffFish();
 
-    setToCell(player, currentDoor.spawn, player.size);
+    if (activeLevel !== "hidden") {
+      setToCell(player, currentDoor.spawn, player.size);
+    } else {
+      toast.textContent = "Wrong answer. No respawn in hidden level. The fish gets faster.";
+    }
+
     doorCooldownUntil = Date.now() + 1400;
 
     feedback.textContent = timedOut ? "Time up. Fish buff activated." : "Wrong answer. Fish buff activated.";
@@ -1428,8 +1417,8 @@ function buffFish() {
   fishBuffLevel++;
 
   enemySpeed = Math.min(
-    activeLevel === "hidden" ? 2.25 : 1.65,
-    currentEnemyBaseSpeed + fishBuffLevel * (activeLevel === "hidden" ? 0.16 : 0.10)
+    activeLevel === "hidden" ? 2.85 : 1.65,
+    currentEnemyBaseSpeed + fishBuffLevel * (activeLevel === "hidden" ? 0.22 : 0.10)
   );
 
   enemyGhost = true;
@@ -1697,8 +1686,13 @@ function checkCoins() {
   for (const coin of coins) {
     if (!coin.collected && dist(playerCenter, { x: coin.x + 7, y: coin.y + 7 }) < 20) {
       coin.collected = true;
-      score += activeLevel === "hidden" ? 8 : 5;
-      cyberCoins++;
+
+      score += activeLevel === "hidden" ? 12 : 5;
+
+      toast.textContent = activeLevel === "hidden"
+        ? "Shadow score collected. +12 score."
+        : "Score coin collected. +5 score.";
+
       playSound("bonus");
       updateHud();
     }
@@ -1942,6 +1936,26 @@ function closeCyberTips() {
   playSound("click");
 }
 
+function openFeedbackForm() {
+  if (!feedbackModal) return;
+
+  feedbackThanks.textContent = "";
+  feedbackModal.classList.add("active");
+  playSound("click");
+}
+
+function closeFeedbackForm() {
+  if (!feedbackModal) return;
+
+  feedbackModal.classList.remove("active");
+  playSound("click");
+}
+
+function submitFeedbackForm() {
+  feedbackThanks.textContent = "Thank you for playing and helping us improve ClickBait!";
+  playSound("bonus");
+}
+
 function loop() {
   if (!running || paused || questionOpen || passwordOpen) {
     animationId = null;
@@ -1992,7 +2006,7 @@ function startGame() {
     "Starting fish AI...",
     "Checking password door...",
     "Activating wall collision system...",
-    "Preparing Cyber Coins...",
+    "Preparing score coins...",
     "Loading final password challenge...",
     "Entering maze..."
   ];
@@ -2067,7 +2081,8 @@ function resumeGame(closePause = true) {
     passwordOpen ||
     reviveModal.classList.contains("active") ||
     finalAnimationModal.classList.contains("active") ||
-    hiddenLevelModal.classList.contains("active")
+    hiddenLevelModal.classList.contains("active") ||
+    feedbackModal.classList.contains("active")
   ) {
     return;
   }
@@ -2096,6 +2111,7 @@ function closeAllModals() {
     endModal,
     loadingModal,
     tipsModal,
+    feedbackModal,
     finalAnimationModal
   ].forEach(modal => {
     if (modal) modal.classList.remove("active");
@@ -2162,6 +2178,11 @@ document.addEventListener("keydown", event => {
   }
 
   if (keyPressed === "escape") {
+    if (feedbackModal && feedbackModal.classList.contains("active")) {
+      closeFeedbackForm();
+      return;
+    }
+
     if (tipsModal && tipsModal.classList.contains("active")) {
       closeCyberTips();
       return;
@@ -2179,6 +2200,7 @@ document.addEventListener("keydown", event => {
     !startModal.classList.contains("active") &&
     !loadingModal.classList.contains("active") &&
     !tipsModal.classList.contains("active") &&
+    !feedbackModal.classList.contains("active") &&
     !finalAnimationModal.classList.contains("active") &&
     !hiddenLevelModal.classList.contains("active")
   ) {
