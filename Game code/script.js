@@ -5,12 +5,15 @@ const ROWS = 17;
 const TOTAL_HEALTH = 20;
 const REVIVE_COST = 3;
 const MAX_REVIVES = 2;
-const QUESTION_TIME = 18;
-const PLAYER_SPEED = 2.45;
-const BASE_ENEMY_SPEED = 0.82;
 const HINT_COST = 1;
 
-const MAP = [
+const MAIN_ENEMY_SPEED = 0.82;
+const HIDDEN_ENEMY_SPEED = 1.35;
+const MAIN_QUESTION_TIME = 18;
+const HIDDEN_QUESTION_TIME = 14;
+const PLAYER_SPEED = 2.45;
+
+const MAIN_MAP = [
   "#############################",
   "#.#...........#.......#.....#",
   "#.#.#####.###.###.###.#####.#",
@@ -30,10 +33,33 @@ const MAP = [
   "#############################"
 ];
 
-const START = { c: 1, r: 15 };
-const EXIT = { c: 27, r: 1 };
+const HIDDEN_MAP = [
+  "#############################",
+  "#.#...........#.......#.....#",
+  "#.#.#####.###.###.###.#####.#",
+  "#.#.....#.#.#.....#...#.....#",
+  "#.##..###.#.#######.###.###.#",
+  "#.#...#...#.......#.#...#.#.#",
+  "#.#.###.###.###.###.###...#.#",
+  "#.#...#.#.....#.#...#...#...#",
+  "#.###.#.#####.#.#.###.###.###",
+  "#...#.#.....#.#.#.#...#...#.#",
+  "#.#.#.#####.###.#.#.###.###.#",
+  "#.....#...#.#...#.#.#...#...#",
+  "#.###.#.###.#.###.#.###.#.#.#",
+  "#.......#...#...#.#.......#.#",
+  "#########.###.#.#.###.#####.#",
+  "#.........#...#.......#.....#",
+  "#############################"
+];
 
-const DOOR_CELLS = [
+const MAIN_START = { c: 1, r: 15 };
+const MAIN_EXIT = { c: 27, r: 1 };
+
+const HIDDEN_START = { c: 1, r: 15 };
+const HIDDEN_EXIT = { c: 27, r: 1 };
+
+const MAIN_DOOR_CELLS = [
   { c: 7, r: 15, spawn: { c: 5, r: 15 }, final: false },
   { c: 10, r: 13, spawn: { c: 9, r: 14 }, final: false },
   { c: 11, r: 9, spawn: { c: 11, r: 11 }, final: false },
@@ -52,7 +78,20 @@ const DOOR_CELLS = [
   { c: 27, r: 2, spawn: { c: 27, r: 4 }, final: true }
 ];
 
-const COIN_CELLS = [
+const HIDDEN_DOOR_CELLS = [
+  { c: 9, r: 15, spawn: { c: 7, r: 15 }, final: false },
+  { c: 11, r: 9, spawn: { c: 11, r: 11 }, final: false },
+  { c: 7, r: 5, spawn: { c: 7, r: 7 }, final: false },
+  { c: 11, r: 1, spawn: { c: 9, r: 1 }, final: false },
+  { c: 17, r: 3, spawn: { c: 15, r: 3 }, final: false },
+  { c: 21, r: 3, spawn: { c: 21, r: 1 }, final: false },
+  { c: 17, r: 7, spawn: { c: 19, r: 7 }, final: false },
+  { c: 17, r: 15, spawn: { c: 17, r: 13 }, final: false },
+  { c: 23, r: 13, spawn: { c: 21, r: 13 }, final: false },
+  { c: 25, r: 7, spawn: { c: 25, r: 9 }, final: false }
+];
+
+const MAIN_COIN_CELLS = [
   { c: 4, r: 11 }, { c: 17, r: 8 }, { c: 15, r: 1 }, { c: 8, r: 9 },
   { c: 25, r: 13 }, { c: 1, r: 5 }, { c: 17, r: 9 }, { c: 2, r: 13 },
   { c: 1, r: 6 }, { c: 15, r: 13 }, { c: 16, r: 3 }, { c: 27, r: 11 },
@@ -60,6 +99,27 @@ const COIN_CELLS = [
   { c: 5, r: 10 }, { c: 24, r: 15 }, { c: 26, r: 15 }, { c: 15, r: 10 },
   { c: 1, r: 1 }, { c: 13, r: 12 }, { c: 17, r: 13 }, { c: 11, r: 12 },
   { c: 15, r: 3 }, { c: 21, r: 5 }
+];
+
+const HIDDEN_COIN_CELLS = [
+  { c: 3, r: 15 },
+  { c: 6, r: 15 },
+  { c: 9, r: 13 },
+  { c: 11, r: 11 },
+  { c: 10, r: 9 },
+  { c: 7, r: 7 },
+  { c: 9, r: 3 },
+  { c: 13, r: 1 },
+  { c: 17, r: 1 },
+  { c: 19, r: 3 },
+  { c: 19, r: 7 },
+  { c: 17, r: 11 },
+  { c: 19, r: 15 },
+  { c: 21, r: 13 },
+  { c: 23, r: 11 },
+  { c: 25, r: 9 },
+  { c: 27, r: 5 },
+  { c: 27, r: 3 }
 ];
 
 const FISH_SRC = "assets/enemy-fish.png";
@@ -85,6 +145,212 @@ const SOUNDS = {
   warning: "sounds/waring bg.wav"
 };
 
+const mainQuestions = [
+  {
+    title: "Door 1: School Account Warning",
+    text: "Your school account will be permanently deleted in 2 hours. The sender is support-schoolservices@gmail.com. What should you do?",
+    answers: ["Click quickly before losing access", "Ignore warning signs because it mentions school", "Check with your school or official platform first", "Reply asking if the email is legitimate"],
+    correct: 2,
+    hint: "Check the sender and verify through the official school system.",
+    lesson: "Urgent account warnings can be phishing. Always verify through official school platforms."
+  },
+  {
+    title: "Door 2: Free Gaming Download",
+    text: "A gaming website says FREE PREMIUM SKINS – DOWNLOAD NOW and immediately starts downloading a file. What should you do?",
+    answers: ["Run the file immediately", "Delete the file and leave the site", "Share with friends first", "Disable antivirus and continue"],
+    correct: 1,
+    hint: "Unexpected downloads are risky.",
+    lesson: "Unknown downloads can contain malware. Delete them and leave the site."
+  },
+  {
+    title: "Door 3: Public WiFi",
+    text: "You connect to free public WiFi and need to log into an important account. What is safest?",
+    answers: ["Log in normally", "Wait until using a trusted connection", "Use easier passwords", "Turn brightness down before logging in"],
+    correct: 1,
+    hint: "Think about whether the network is trusted.",
+    lesson: "Public WiFi can be unsafe for important accounts. Use a trusted connection."
+  },
+  {
+    title: "Door 4: Fake Instagram Page",
+    text: "URL: secure-instagram-login.verify-account.net. The page looks identical to Instagram. What is the strongest warning sign?",
+    answers: ["It uses dark mode", "It loaded quickly", "The web address is unusual", "It asked for your username"],
+    correct: 2,
+    hint: "A fake page can look real. Check the URL.",
+    lesson: "The web address is one of the biggest warning signs of a fake login page."
+  },
+  {
+    title: "Door 5: Unexpected Link",
+    text: "A friend sends an unknown link. It requests login, then payment information. When should you stop?",
+    answers: ["After payment request", "After login request", "After receiving unexpected link", "After account gets locked"],
+    correct: 2,
+    hint: "The safest time to stop is before clicking.",
+    lesson: "Stop when you receive an unexpected link. Verify with the person first."
+  },
+  {
+    title: "Door 6: Password Strength",
+    text: "Password A: BlueFoxTrainCoffeePizza99. Password B: G!7$qL#2z@8. Which is better security practice?",
+    answers: ["Password A because it is longer and unique", "Password B because symbols always mean stronger security", "Both are equally secure", "Neither because passwords should never contain words"],
+    correct: 0,
+    hint: "Length and uniqueness matter.",
+    lesson: "Long unique passphrases can be strong and easier to remember."
+  },
+  {
+    title: "Door 7: Verification Code",
+    text: "A close friend asks you to receive a verification code for them. The account looks genuine. What is safest?",
+    answers: ["Help because you know them personally", "Send only part of the code", "Refuse because verification codes should stay private", "Ask them to promise not to misuse it"],
+    correct: 2,
+    hint: "A verification code is like an account key.",
+    lesson: "Never share verification codes. Even real-looking accounts can be hacked."
+  },
+  {
+    title: "Door 8: QR Code Login",
+    text: "A QR website uses HTTPS, looks professional, asks for school login details, and the URL is unrelated to your school. What is the greatest concern?",
+    answers: ["QR codes are always dangerous", "Professional design", "Unrelated website requesting credentials", "HTTPS encryption"],
+    correct: 2,
+    hint: "HTTPS does not always mean the site is trusted.",
+    lesson: "A fake website can still use HTTPS. Check if the site belongs to your school."
+  },
+  {
+    title: "Door 9: Suspicious Link Clicked",
+    text: "You accidentally click a suspicious link. Nothing downloads and nothing happens. What is the BEST response?",
+    answers: ["Ignore it because nothing happened", "Restart device immediately", "Monitor activity and avoid entering information afterward", "Factory reset device"],
+    correct: 2,
+    hint: "Nothing visible does not always mean safe.",
+    lesson: "After clicking a suspicious link, avoid entering details and monitor your accounts."
+  },
+  {
+    title: "Door 10: Shared Computer",
+    text: "You use a school computer. After logging out, the browser asks Save password? What is safest?",
+    answers: ["Save because computer requires login already", "Save temporarily", "Decline saving credentials on shared devices", "Save if browser looks trustworthy"],
+    correct: 2,
+    hint: "Other people may use the device later.",
+    lesson: "Never save passwords on shared computers."
+  },
+  {
+    title: "Door 11: School Portal Email",
+    text: "A school portal email asks you to sign in again. The sender matches previous emails and the link opens the correct domain. What should you do?",
+    answers: ["Log in immediately because domain is correct", "Ignore the email completely", "Access the portal manually rather than through the email link", "Reply asking whether it is legitimate"],
+    correct: 2,
+    hint: "Manual access is safer than email links.",
+    lesson: "Open important portals manually instead of clicking email links."
+  },
+  {
+    title: "Door 12: Delivery Message",
+    text: "You order gaming equipment. Ten minutes later, a delivery message has correct branding, order number, first name, and HTTPS link. Best action?",
+    answers: ["Enter details because information matches recent activity", "Click link but avoid entering payment details", "Open retailer website independently and verify delivery information there", "Trust message because scammers cannot know order numbers"],
+    correct: 2,
+    hint: "Scammers can sometimes know real order details.",
+    lesson: "Realistic details do not prove safety. Verify through the official retailer site."
+  },
+  {
+    title: "Door 13: Safe Charging",
+    text: "Your phone battery is low at an event. Option A: free USB cable already connected. Option B: power socket only. Option C: staff charger. What is safest?",
+    answers: ["Option A because charging is charging", "Option B", "Option C because staff are trusted", "Use whichever charges fastest"],
+    correct: 1,
+    hint: "USB cables can transfer data.",
+    lesson: "A power socket is safer than an unknown USB cable."
+  },
+  {
+    title: "Door 14: Urgency Trick",
+    text: "Why do many phishing attacks create urgency?",
+    answers: ["Faster internet connections require speed", "Urgency increases mistakes and reduces critical thinking", "Messages expire automatically", "Attackers cannot send longer messages"],
+    correct: 1,
+    hint: "Urgency makes people rush.",
+    lesson: "Urgency reduces careful thinking. Scammers want fast mistakes."
+  },
+  {
+    title: "Door 15: Spam Filter Trust",
+    text: "An email has correct branding, correct domain spelling, expected timing and passes spam filters. Which assumption is MOST dangerous?",
+    answers: ["Thinking branding proves legitimacy", "Thinking spam filters catch everything", "Thinking timing matters", "Thinking security updates exist"],
+    correct: 1,
+    hint: "Spam filters help, but they are not perfect.",
+    lesson: "Spam filters do not catch everything. You still need to check carefully."
+  }
+];
+
+const hiddenQuestions = [
+  {
+    title: "Hidden Door 1: HTTPS Trap",
+    text: "A website has a padlock icon and HTTPS, but the domain is school-login-help.net instead of your school’s real website. What is the biggest risk?",
+    answers: ["HTTPS means it is always safe", "The website may still be fake even with HTTPS", "The padlock means the school owns it", "Only old websites are dangerous"],
+    correct: 1,
+    hint: "HTTPS protects connection, not honesty.",
+    lesson: "HTTPS only means the connection is encrypted. A fake website can also use HTTPS."
+  },
+  {
+    title: "Hidden Door 2: Credential Stuffing",
+    text: "You used the same password for a game account and your school email. The game website gets hacked. What attack could happen next?",
+    answers: ["Credential stuffing", "Screen freezing", "WiFi boosting", "File compression"],
+    correct: 0,
+    hint: "Attackers try leaked passwords on other accounts.",
+    lesson: "Credential stuffing is when attackers use leaked usernames and passwords on other websites."
+  },
+  {
+    title: "Hidden Door 3: Recovery Code",
+    text: "A friend asks for your recovery code because they say they need help logging in. Why is this dangerous?",
+    answers: ["Recovery codes can unlock your account", "Recovery codes only work once so they are safe", "Friends cannot misuse codes", "Codes are only for games"],
+    correct: 0,
+    hint: "Recovery codes are like backup keys.",
+    lesson: "Recovery codes can bypass normal login protection. Never share them."
+  },
+  {
+    title: "Hidden Door 4: Fake Support",
+    text: "A message says: 'We detected suspicious activity. Send your password so support can secure your account.' What is the best answer?",
+    answers: ["Send the password if the message looks professional", "Send only half of the password", "Never share your password with support", "Ask support to delete the message"],
+    correct: 2,
+    hint: "Real support should not ask for passwords.",
+    lesson: "Real support teams never need your password. Anyone asking for it is suspicious."
+  },
+  {
+    title: "Hidden Door 5: QR Phishing",
+    text: "A poster at school says 'Scan to get free exam answers'. The QR code opens a login page. What should you do?",
+    answers: ["Login quickly before it expires", "Scan again on another phone", "Close it and report it", "Share it with classmates"],
+    correct: 2,
+    hint: "Free exam answers is already suspicious.",
+    lesson: "QR codes can hide dangerous links. Close suspicious pages and report them."
+  },
+  {
+    title: "Hidden Door 6: Social Engineering",
+    text: "An attacker does not hack the system. Instead, they trick a student into giving login details. What is this called?",
+    answers: ["Social engineering", "File backup", "Password hashing", "Software update"],
+    correct: 0,
+    hint: "The attack targets the person.",
+    lesson: "Social engineering tricks people into making security mistakes."
+  },
+  {
+    title: "Hidden Door 7: Shared Computer",
+    text: "You are using a shared school computer. The browser asks to save your password. Why should you click 'Never'?",
+    answers: ["Saved passwords can be accessed by the next user", "Saving passwords makes internet slower", "The keyboard will stop working", "Passwords become shorter"],
+    correct: 0,
+    hint: "Think who uses it after you.",
+    lesson: "Never save passwords on shared or public computers."
+  },
+  {
+    title: "Hidden Door 8: Deepfake Voice",
+    text: "You get a voice message that sounds like your friend asking for your login code. What is the safest action?",
+    answers: ["Trust it because it sounds real", "Send the code quickly", "Verify with them using another method", "Post the code in a group chat"],
+    correct: 2,
+    hint: "Voices can be faked.",
+    lesson: "AI can fake voices. Verify strange requests another way."
+  },
+  {
+    title: "Hidden Door 9: MFA Fatigue",
+    text: "You keep getting login approval notifications even though you are not logging in. What might an attacker be trying?",
+    answers: ["Making your phone faster", "Annoying you until you press approve", "Updating your account", "Improving your password"],
+    correct: 1,
+    hint: "They want one mistaken tap.",
+    lesson: "MFA fatigue attacks spam approval requests until the user accidentally accepts one."
+  },
+  {
+    title: "Hidden Door 10: Emergency Response",
+    text: "You entered your password on a suspicious website, then realised it may be fake. What should you do first?",
+    answers: ["Wait to see what happens", "Delete browser history only", "Change the password on the real website immediately", "Message the fake website asking for deletion"],
+    correct: 2,
+    hint: "Act before the attacker uses it.",
+    lesson: "If you entered a password on a fake site, change it immediately on the real site and enable 2FA."
+  }
+];
+
 const $ = id => document.getElementById(id);
 
 const canvas = $("game");
@@ -104,6 +370,7 @@ doorOpenImg.src = DOOR_OPEN_SRC;
 
 const audio = {};
 let soundOn = localStorage.getItem("clickbaitSound") !== "off";
+let audioUnlocked = false;
 
 for (const [name, src] of Object.entries(SOUNDS)) {
   audio[name] = new Audio(src);
@@ -113,6 +380,7 @@ for (const [name, src] of Object.entries(SOUNDS)) {
 audio.bg.loop = true;
 audio.bg.volume = 0.22;
 
+const levelHud = $("levelHud");
 const userHud = $("userHud");
 const scoreEl = $("score");
 const bestScoreEl = $("bestScore");
@@ -120,7 +388,6 @@ const healthEl = $("health");
 const cyberCoinsHud = $("cyberCoinsHud");
 const doorsHudEl = $("doorsHud");
 const timeEl = $("time");
-const bestTimeEl = $("bestTime");
 const fishHud = $("fishHud");
 const toast = $("toast");
 const damageFlash = $("damageFlash");
@@ -129,12 +396,17 @@ const startModal = $("startModal");
 const loadingModal = $("loadingModal");
 const loadingFill = $("loadingFill");
 const loadingText = $("loadingText");
+const loadingTitle = $("loadingTitle");
 const pauseModal = $("pauseModal");
 const qModal = $("questionModal");
 const passwordModal = $("passwordModal");
 const reviveModal = $("reviveModal");
 const learningModal = $("learningModal");
+const hiddenLevelModal = $("hiddenLevelModal");
 const endModal = $("endModal");
+const tipsModal = $("tipsModal");
+const finalAnimationModal = $("finalAnimationModal");
+const finalAnimationVideo = $("finalAnimationVideo");
 
 const qTitle = $("questionTitle");
 const qText = $("questionText");
@@ -162,208 +434,21 @@ const loginUsername = $("loginUsername");
 const loginPassword = $("loginPassword");
 const registerUsername = $("registerUsername");
 const registerPassword = $("registerPassword");
+const registerStrength = $("registerStrength");
 const authMessage = $("authMessage");
 const loggedInBox = $("loggedInBox");
 const loggedInName = $("loggedInName");
 const soundBtn = $("soundBtn");
 
-const questions = [
-  {
-    title: "Door 1: School Account Warning",
-    text: "Your school account will be permanently deleted in 2 hours. The sender is support-schoolservices@gmail.com. What should you do?",
-    answers: [
-      "Click quickly before losing access",
-      "Ignore warning signs because it mentions school",
-      "Check with your school or official platform first",
-      "Reply asking if the email is legitimate"
-    ],
-    correct: 2,
-    hint: "Check the sender and verify through the official school system.",
-    lesson: "Urgent account warnings can be phishing. Always verify through official school platforms."
-  },
-  {
-    title: "Door 2: Free Gaming Download",
-    text: "A gaming website says FREE PREMIUM SKINS – DOWNLOAD NOW and immediately starts downloading a file. What should you do?",
-    answers: [
-      "Run the file immediately",
-      "Delete the file and leave the site",
-      "Share with friends first",
-      "Disable antivirus and continue"
-    ],
-    correct: 1,
-    hint: "Unexpected downloads are risky.",
-    lesson: "Unknown downloads can contain malware. Delete them and leave the site."
-  },
-  {
-    title: "Door 3: Public WiFi",
-    text: "You connect to free public WiFi and need to log into an important account. What is safest?",
-    answers: [
-      "Log in normally",
-      "Wait until using a trusted connection",
-      "Use easier passwords",
-      "Turn brightness down before logging in"
-    ],
-    correct: 1,
-    hint: "Think about whether the network is trusted.",
-    lesson: "Public WiFi can be unsafe for important accounts. Use a trusted connection."
-  },
-  {
-    title: "Door 4: Fake Instagram Page",
-    text: "URL: secure-instagram-login.verify-account.net. The page looks identical to Instagram. What is the strongest warning sign?",
-    answers: [
-      "It uses dark mode",
-      "It loaded quickly",
-      "The web address is unusual",
-      "It asked for your username"
-    ],
-    correct: 2,
-    hint: "A fake page can look real. Check the URL.",
-    lesson: "The web address is one of the biggest warning signs of a fake login page."
-  },
-  {
-    title: "Door 5: Unexpected Link",
-    text: "A friend sends an unknown link. It requests login, then payment information. When should you stop?",
-    answers: [
-      "After payment request",
-      "After login request",
-      "After receiving unexpected link",
-      "After account gets locked"
-    ],
-    correct: 2,
-    hint: "The safest time to stop is before clicking.",
-    lesson: "Stop when you receive an unexpected link. Verify with the person first."
-  },
-  {
-    title: "Door 6: Password Strength",
-    text: "Password A: BlueFoxTrainCoffeePizza99. Password B: G!7$qL#2z@8. Which is better security practice?",
-    answers: [
-      "Password A because it is longer and unique",
-      "Password B because symbols always mean stronger security",
-      "Both are equally secure",
-      "Neither because passwords should never contain words"
-    ],
-    correct: 0,
-    hint: "Length and uniqueness matter.",
-    lesson: "Long unique passphrases can be strong and easier to remember."
-  },
-  {
-    title: "Door 7: Verification Code",
-    text: "A close friend asks you to receive a verification code for them. The account looks genuine. What is safest?",
-    answers: [
-      "Help because you know them personally",
-      "Send only part of the code",
-      "Refuse because verification codes should stay private",
-      "Ask them to promise not to misuse it"
-    ],
-    correct: 2,
-    hint: "A verification code is like an account key.",
-    lesson: "Never share verification codes. Even real-looking accounts can be hacked."
-  },
-  {
-    title: "Door 8: QR Code Login",
-    text: "A QR website uses HTTPS, looks professional, asks for school login details, and the URL is unrelated to your school. What is the greatest concern?",
-    answers: [
-      "QR codes are always dangerous",
-      "Professional design",
-      "Unrelated website requesting credentials",
-      "HTTPS encryption"
-    ],
-    correct: 2,
-    hint: "HTTPS does not always mean the site is trusted.",
-    lesson: "A fake website can still use HTTPS. Check if the site belongs to your school."
-  },
-  {
-    title: "Door 9: Suspicious Link Clicked",
-    text: "You accidentally click a suspicious link. Nothing downloads and nothing happens. What is the BEST response?",
-    answers: [
-      "Ignore it because nothing happened",
-      "Restart device immediately",
-      "Monitor activity and avoid entering information afterward",
-      "Factory reset device"
-    ],
-    correct: 2,
-    hint: "Nothing visible does not always mean safe.",
-    lesson: "After clicking a suspicious link, avoid entering details and monitor your accounts."
-  },
-  {
-    title: "Door 10: Shared Computer",
-    text: "You use a school computer. After logging out, the browser asks Save password? What is safest?",
-    answers: [
-      "Save because computer requires login already",
-      "Save temporarily",
-      "Decline saving credentials on shared devices",
-      "Save if browser looks trustworthy"
-    ],
-    correct: 2,
-    hint: "Other people may use the device later.",
-    lesson: "Never save passwords on shared computers."
-  },
-  {
-    title: "Door 11: School Portal Email",
-    text: "A school portal email asks you to sign in again. The sender matches previous emails and the link opens the correct domain. What should you do?",
-    answers: [
-      "Log in immediately because domain is correct",
-      "Ignore the email completely",
-      "Access the portal manually rather than through the email link",
-      "Reply asking whether it is legitimate"
-    ],
-    correct: 2,
-    hint: "Manual access is safer than email links.",
-    lesson: "Open important portals manually instead of clicking email links."
-  },
-  {
-    title: "Door 12: Delivery Message",
-    text: "You order gaming equipment. Ten minutes later, a delivery message has correct branding, order number, first name, and HTTPS link. Best action?",
-    answers: [
-      "Enter details because information matches recent activity",
-      "Click link but avoid entering payment details",
-      "Open retailer website independently and verify delivery information there",
-      "Trust message because scammers cannot know order numbers"
-    ],
-    correct: 2,
-    hint: "Scammers can sometimes know real order details.",
-    lesson: "Realistic details do not prove safety. Verify through the official retailer site."
-  },
-  {
-    title: "Door 13: Safe Charging",
-    text: "Your phone battery is low at an event. Option A: free USB cable already connected. Option B: power socket only. Option C: staff charger. What is safest?",
-    answers: [
-      "Option A because charging is charging",
-      "Option B",
-      "Option C because staff are trusted",
-      "Use whichever charges fastest"
-    ],
-    correct: 1,
-    hint: "USB cables can transfer data.",
-    lesson: "A power socket is safer than an unknown USB cable."
-  },
-  {
-    title: "Door 14: Urgency Trick",
-    text: "Why do many phishing attacks create urgency?",
-    answers: [
-      "Faster internet connections require speed",
-      "Urgency increases mistakes and reduces critical thinking",
-      "Messages expire automatically",
-      "Attackers cannot send longer messages"
-    ],
-    correct: 1,
-    hint: "Urgency makes people rush.",
-    lesson: "Urgency reduces careful thinking. Scammers want fast mistakes."
-  },
-  {
-    title: "Door 15: Spam Filter Trust",
-    text: "An email has correct branding, correct domain spelling, expected timing and passes spam filters. Which assumption is MOST dangerous?",
-    answers: [
-      "Thinking branding proves legitimacy",
-      "Thinking spam filters catch everything",
-      "Thinking timing matters",
-      "Thinking security updates exist"
-    ],
-    correct: 1,
-    hint: "Spam filters help, but they are not perfect.",
-    lesson: "Spam filters do not catch everything. You still need to check carefully."
-  }
-];
+let activeLevel = "main";
+let currentMap = MAIN_MAP;
+let currentStart = MAIN_START;
+let currentExit = MAIN_EXIT;
+let currentDoorCells = MAIN_DOOR_CELLS;
+let currentCoinCells = MAIN_COIN_CELLS;
+let currentQuestions = mainQuestions;
+let currentEnemyBaseSpeed = MAIN_ENEMY_SPEED;
+let currentQuestionTime = MAIN_QUESTION_TIME;
 
 let keys = {};
 let player;
@@ -374,7 +459,7 @@ let coins;
 let score = 0;
 let health = TOTAL_HEALTH;
 let cyberCoins = 0;
-let enemySpeed = BASE_ENEMY_SPEED;
+let enemySpeed = MAIN_ENEMY_SPEED;
 let fishBuffLevel = 0;
 let elapsed = 0;
 let startTime = Date.now();
@@ -394,7 +479,7 @@ let questionInterval = null;
 let ghostTimer = null;
 let gameTimerInterval = null;
 
-let questionTimeLeft = QUESTION_TIME;
+let questionTimeLeft = MAIN_QUESTION_TIME;
 let enemyGhost = false;
 let enemyPath = [];
 let lastPathUpdate = 0;
@@ -402,6 +487,7 @@ let lastWallDamage = 0;
 
 let playerFacing = "right";
 let playerMoving = false;
+let enemyFacing = "left";
 let lastDeathReason = "";
 let enemyFrozenUntil = 0;
 let doorCooldownUntil = 0;
@@ -412,26 +498,62 @@ let questionsAnswered = 0;
 let correctAnswers = 0;
 let wrongAnswers = 0;
 let revivesUsed = 0;
+let hiddenCompleted = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  audioUnlocked = true;
+
+  for (const sound of Object.values(audio)) {
+    sound.volume = sound === audio.bg ? 0.22 : 0.8;
+
+    sound.play()
+      .then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+      })
+      .catch(() => {});
+  }
+}
 
 function playSound(name) {
   if (!soundOn) return;
+
   const sound = audio[name];
-  if (!sound) return;
+
+  if (!sound) {
+    console.warn("Sound not found:", name);
+    return;
+  }
 
   try {
-    sound.currentTime = 0;
-    sound.play().catch(() => {});
-  } catch {}
+    const clone = sound.cloneNode();
+    clone.volume = sound.volume || 0.8;
+    clone.play().catch(error => {
+      console.warn("Sound play failed:", name, error.message);
+    });
+  } catch (error) {
+    console.warn("Sound error:", name, error.message);
+  }
 }
 
 function startMusic() {
   if (!soundOn) return;
-  audio.bg.play().catch(() => {});
+
+  audio.bg.volume = activeLevel === "hidden" ? 0.16 : 0.22;
+  audio.bg.loop = true;
+
+  audio.bg.play().catch(error => {
+    console.warn("Background music blocked or missing:", error.message);
+  });
 }
 
 function stopMusic() {
-  audio.bg.pause();
-  audio.bg.currentTime = 0;
+  try {
+    audio.bg.pause();
+    audio.bg.currentTime = 0;
+  } catch {}
 }
 
 function toggleSound() {
@@ -490,6 +612,7 @@ function showRegister() {
   loginPanel.classList.add("hidden");
   registerPanel.classList.remove("hidden");
   authMessage.textContent = "";
+  updateRegisterStrength();
   playSound("click");
 }
 
@@ -500,13 +623,61 @@ function showLogin() {
   playSound("click");
 }
 
+function getRegisterPasswordIssues(password) {
+  const issues = [];
+
+  if (password.length < 8) issues.push("8 characters");
+  if (!/[A-Z]/.test(password)) issues.push("uppercase letter");
+  if (!/[a-z]/.test(password)) issues.push("lowercase letter");
+  if (!/[0-9]/.test(password)) issues.push("number");
+  if (!/[^A-Za-z0-9]/.test(password)) issues.push("special character");
+
+  return issues;
+}
+
+function updateRegisterStrength() {
+  if (!registerStrength) return;
+
+  const password = registerPassword.value;
+  const issues = getRegisterPasswordIssues(password);
+
+  registerStrength.classList.remove("medium", "strong");
+
+  if (!password) {
+    registerStrength.textContent = "Password needs 8 characters, uppercase, lowercase, number, and special character.";
+    return;
+  }
+
+  if (issues.length === 0) {
+    registerStrength.textContent = "Strong password. Good cyber habit!";
+    registerStrength.classList.add("strong");
+    return;
+  }
+
+  if (issues.length <= 2) {
+    registerStrength.textContent = "Almost strong. Add: " + issues.join(", ") + ".";
+    registerStrength.classList.add("medium");
+    return;
+  }
+
+  registerStrength.textContent = "Weak password. Add: " + issues.join(", ") + ".";
+}
+
 function registerUser() {
   const username = safeName(registerUsername.value);
   const password = registerPassword.value;
   const users = getUsers();
 
-  if (!username || password.length < 4) {
-    authMessage.textContent = "Use a username and at least 4 password characters.";
+  if (!username) {
+    authMessage.textContent = "Please enter a username.";
+    return;
+  }
+
+  const passwordIssues = getRegisterPasswordIssues(password);
+
+  if (passwordIssues.length > 0) {
+    authMessage.textContent = "Use a stronger password. Missing: " + passwordIssues.join(", ") + ".";
+    updateRegisterStrength();
     return;
   }
 
@@ -597,6 +768,30 @@ function goSetupPage(page) {
   playSound("click");
 }
 
+function setLevel(levelName) {
+  activeLevel = levelName;
+
+  if (levelName === "hidden") {
+    currentMap = HIDDEN_MAP;
+    currentStart = HIDDEN_START;
+    currentExit = HIDDEN_EXIT;
+    currentDoorCells = HIDDEN_DOOR_CELLS;
+    currentCoinCells = HIDDEN_COIN_CELLS;
+    currentQuestions = hiddenQuestions;
+    currentEnemyBaseSpeed = HIDDEN_ENEMY_SPEED;
+    currentQuestionTime = HIDDEN_QUESTION_TIME;
+  } else {
+    currentMap = MAIN_MAP;
+    currentStart = MAIN_START;
+    currentExit = MAIN_EXIT;
+    currentDoorCells = MAIN_DOOR_CELLS;
+    currentCoinCells = MAIN_COIN_CELLS;
+    currentQuestions = mainQuestions;
+    currentEnemyBaseSpeed = MAIN_ENEMY_SPEED;
+    currentQuestionTime = MAIN_QUESTION_TIME;
+  }
+}
+
 function cellCenter(cell) {
   return {
     x: cell.c * TILE + TILE / 2,
@@ -640,7 +835,7 @@ function formatTime(seconds) {
 }
 
 function isWall(c, r) {
-  return c < 0 || r < 0 || c >= COLS || r >= ROWS || MAP[r][c] === "#";
+  return c < 0 || r < 0 || c >= COLS || r >= ROWS || currentMap[r][c] === "#";
 }
 
 function nextDoor() {
@@ -731,18 +926,20 @@ function findPath(start, goal, blockDoors = false) {
   return path.reverse();
 }
 
-function resetState() {
+function resetState(keepLevel = false) {
+  if (!keepLevel) setLevel("main");
+
   player = { x: 0, y: 0, size: 26 };
   enemy = { x: 0, y: 0, size: 34 };
 
-  doors = DOOR_CELLS.map((door, index) => ({
+  doors = currentDoorCells.map((door, index) => ({
     ...door,
     id: index + 1,
     unlocked: false,
     lockedBehind: false
   }));
 
-  coins = COIN_CELLS.map(cell => {
+  coins = currentCoinCells.map(cell => {
     const p = cellCenter(cell);
 
     return {
@@ -756,7 +953,7 @@ function resetState() {
   score = 0;
   health = TOTAL_HEALTH;
   cyberCoins = 0;
-  enemySpeed = BASE_ENEMY_SPEED;
+  enemySpeed = currentEnemyBaseSpeed;
   fishBuffLevel = 0;
   elapsed = 0;
   startTime = Date.now();
@@ -771,6 +968,7 @@ function resetState() {
   enemyPath = [];
   playerFacing = "right";
   playerMoving = false;
+  enemyFacing = activeLevel === "hidden" ? "left" : "right";
 
   lastPathUpdate = 0;
   lastWallDamage = 0;
@@ -790,22 +988,27 @@ function resetState() {
   if (ghostTimer) clearTimeout(ghostTimer);
   if (questionInterval) clearInterval(questionInterval);
 
-  setToCell(player, START, player.size);
-  setToCell(enemy, { c: 1, r: 1 }, enemy.size);
+  setToCell(player, currentStart, player.size);
+
+  if (activeLevel === "hidden") {
+    setToCell(enemy, { c: 27, r: 15 }, enemy.size);
+  } else {
+    setToCell(enemy, { c: 1, r: 1 }, enemy.size);
+  }
 
   updateHud();
   draw();
 }
 
 function updateHud() {
+  levelHud.textContent = activeLevel === "hidden" ? "Hidden" : "Main";
   userHud.textContent = currentUser || "Guest";
   scoreEl.textContent = score;
   bestScoreEl.textContent = bestScore;
   healthEl.textContent = health;
   cyberCoinsHud.textContent = cyberCoins;
-  doorsHudEl.textContent = `${doors ? doors.filter(d => d.unlocked).length : 0}/${DOOR_CELLS.length}`;
+  doorsHudEl.textContent = `${doors ? doors.filter(d => d.unlocked).length : 0}/${currentDoorCells.length}`;
   timeEl.textContent = formatTime(elapsed);
-  bestTimeEl.textContent = bestTime ? formatTime(bestTime) : "--:--";
   fishHud.textContent = `Buff ${fishBuffLevel}${enemyGhost ? " 👻" : ""}`;
 }
 
@@ -814,20 +1017,20 @@ function drawTile(c, r, type) {
   const y = r * TILE;
 
   if (type === "#") {
-    ctx.fillStyle = "#1e293b";
+    ctx.fillStyle = activeLevel === "hidden" ? "#111827" : "#1e293b";
     ctx.fillRect(x, y, TILE, TILE);
 
-    ctx.fillStyle = "#334155";
+    ctx.fillStyle = activeLevel === "hidden" ? "#312e81" : "#334155";
     ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
 
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.fillRect(x + 7, y + 8, 14, 3);
     ctx.fillRect(x + 21, y + 25, 11, 3);
   } else {
-    ctx.fillStyle = "#71717a";
+    ctx.fillStyle = activeLevel === "hidden" ? "#27272a" : "#71717a";
     ctx.fillRect(x, y, TILE, TILE);
 
-    ctx.fillStyle = "#52525b";
+    ctx.fillStyle = activeLevel === "hidden" ? "#3f3f46" : "#52525b";
     ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
   }
 }
@@ -838,7 +1041,7 @@ function draw() {
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      drawTile(c, r, MAP[r][c]);
+      drawTile(c, r, currentMap[r][c]);
     }
   }
 
@@ -854,10 +1057,10 @@ function drawCoins() {
   for (const coin of coins || []) {
     if (coin.collected) continue;
 
-    ctx.fillStyle = "#fde68a";
+    ctx.fillStyle = activeLevel === "hidden" ? "#c084fc" : "#fde68a";
     ctx.fillRect(coin.x + 2, coin.y, 10, 14);
 
-    ctx.fillStyle = "#f59e0b";
+    ctx.fillStyle = activeLevel === "hidden" ? "#7e22ce" : "#f59e0b";
     ctx.fillRect(coin.x + 4, coin.y + 3, 6, 8);
   }
 }
@@ -871,51 +1074,46 @@ function drawDoors() {
     if (!door.unlocked && (!activeDoor || door.id !== activeDoor.id)) continue;
 
     const p = cellCenter(door);
-
     let img = door.unlocked ? doorOpenImg : doorClosedImg;
 
-    if (door.lockedBehind) {
-      img = doorClosedImg;
-    }
+    if (door.lockedBehind) img = doorClosedImg;
 
     if (img.complete && img.naturalWidth > 0) {
       ctx.drawImage(img, p.x - 20, p.y - 34, 40, 56);
     } else {
-      ctx.fillStyle = door.lockedBehind ? "#ef4444" : door.unlocked ? "#22c55e" : "#facc15";
+      ctx.fillStyle = door.lockedBehind ? "#ef4444" : door.unlocked ? "#22c55e" : activeLevel === "hidden" ? "#c084fc" : "#facc15";
       ctx.fillRect(p.x - 16, p.y - 26, 32, 42);
     }
 
     ctx.fillStyle = "#020617";
-    ctx.fillRect(p.x - 31, p.y - 62, 64, 18);
+    ctx.fillRect(p.x - 35, p.y - 62, 70, 18);
 
-    ctx.strokeStyle = door.lockedBehind ? "#ef4444" : "#67e8f9";
-    ctx.strokeRect(p.x - 31, p.y - 62, 64, 18);
+    ctx.strokeStyle = door.lockedBehind ? "#ef4444" : activeLevel === "hidden" ? "#c084fc" : "#67e8f9";
+    ctx.strokeRect(p.x - 35, p.y - 62, 70, 18);
 
     ctx.fillStyle = "#e0f2fe";
     ctx.font = "10px Courier New";
 
-    let label = door.final ? "FINAL" : `DOOR ${door.id}`;
+    let label = activeLevel === "hidden" ? `H-${door.id}` : door.final ? "FINAL" : `DOOR ${door.id}`;
 
-    if (door.lockedBehind) {
-      label = "LOCKED";
-    }
+    if (door.lockedBehind) label = "LOCKED";
 
-    ctx.fillText(label, p.x - 24, p.y - 49);
+    ctx.fillText(label, p.x - 26, p.y - 49);
   }
 }
 
 function drawExit() {
-  const ep = cellCenter(EXIT);
+  const ep = cellCenter(currentExit);
 
   ctx.fillStyle = "#020617";
-  ctx.fillRect(ep.x - 24, ep.y - 28, 48, 24);
+  ctx.fillRect(ep.x - 34, ep.y - 28, 68, 24);
 
-  ctx.strokeStyle = "#67e8f9";
-  ctx.strokeRect(ep.x - 24, ep.y - 28, 48, 24);
+  ctx.strokeStyle = activeLevel === "hidden" ? "#c084fc" : "#67e8f9";
+  ctx.strokeRect(ep.x - 34, ep.y - 28, 68, 24);
 
-  ctx.fillStyle = "#67e8f9";
+  ctx.fillStyle = activeLevel === "hidden" ? "#c084fc" : "#67e8f9";
   ctx.font = "bold 12px Courier New";
-  ctx.fillText("EXIT", ep.x - 14, ep.y - 12);
+  ctx.fillText(activeLevel === "hidden" ? "H-EXIT" : "EXIT", ep.x - 28, ep.y - 12);
 }
 
 function drawPlayer() {
@@ -923,7 +1121,6 @@ function drawPlayer() {
   const h = 42;
   const x = player.x - 6;
   const y = player.y - 10;
-
   const walkBounce = playerMoving ? Math.sin(Date.now() / 90) * 2 : 0;
 
   ctx.save();
@@ -946,7 +1143,7 @@ function drawPlayer() {
 }
 
 function drawEnemy() {
-  const buffSize = fishBuffLevel * 4;
+  const buffSize = fishBuffLevel * 4 + (activeLevel === "hidden" ? 6 : 0);
   const drawSize = 40 + buffSize;
   const offset = (drawSize - enemy.size) / 2;
 
@@ -954,15 +1151,21 @@ function drawEnemy() {
 
   if (Date.now() < enemyFrozenUntil || finalPasswordLocked) {
     ctx.globalAlpha = 0.35;
-  } else if (enemyGhost || fishBuffLevel > 0) {
-    ctx.shadowColor = enemyGhost ? "rgba(239,68,68,.95)" : "rgba(251,191,36,.85)";
+  } else if (enemyGhost || fishBuffLevel > 0 || activeLevel === "hidden") {
+    ctx.shadowColor = activeLevel === "hidden" ? "rgba(192,132,252,.95)" : "rgba(239,68,68,.95)";
     ctx.shadowBlur = 20 + fishBuffLevel * 4;
   }
 
   if (fishImg.complete && fishImg.naturalWidth > 0) {
-    ctx.drawImage(fishImg, enemy.x - offset, enemy.y - offset, drawSize, drawSize);
+    if (enemyFacing === "left") {
+      ctx.translate(enemy.x - offset + drawSize, enemy.y - offset);
+      ctx.scale(-1, 1);
+      ctx.drawImage(fishImg, 0, 0, drawSize, drawSize);
+    } else {
+      ctx.drawImage(fishImg, enemy.x - offset, enemy.y - offset, drawSize, drawSize);
+    }
   } else {
-    ctx.fillStyle = enemyGhost ? "#a855f7" : "#ef4444";
+    ctx.fillStyle = activeLevel === "hidden" ? "#9333ea" : "#ef4444";
     ctx.fillRect(enemy.x, enemy.y, drawSize, drawSize);
   }
 
@@ -980,7 +1183,7 @@ function drawVignette() {
   );
 
   gradient.addColorStop(0, "rgba(0,0,0,0)");
-  gradient.addColorStop(1, "rgba(0,0,0,.45)");
+  gradient.addColorStop(1, activeLevel === "hidden" ? "rgba(45,0,80,.55)" : "rgba(0,0,0,.45)");
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -988,10 +1191,7 @@ function drawVignette() {
 
 function flashDamage() {
   damageFlash.classList.add("active");
-
-  setTimeout(() => {
-    damageFlash.classList.remove("active");
-  }, 260);
+  setTimeout(() => damageFlash.classList.remove("active"), 260);
 }
 
 function damage(reason) {
@@ -1006,12 +1206,9 @@ function damage(reason) {
   playSound("damage");
 
   toast.textContent = `${reason} -2 health. Health left: ${health}/${TOTAL_HEALTH}`;
-
   updateHud();
 
-  if (health <= 0) {
-    handlePlayerDeath("You lost all health.");
-  }
+  if (health <= 0) handlePlayerDeath("You lost all health.");
 }
 
 function movePlayer() {
@@ -1064,7 +1261,11 @@ function checkDoor() {
   const isNear = dist(center(player, player.size), cellCenter(door)) < TILE * 1.15;
 
   if (isNear) {
-    door.final ? openPasswordDoor(door) : openQuestion(door);
+    if (door.final && activeLevel === "main") {
+      openPasswordDoor(door);
+    } else {
+      openQuestion(door);
+    }
   }
 }
 
@@ -1083,14 +1284,14 @@ function openQuestion(door) {
   hintText.textContent = "";
   answers.innerHTML = "";
 
-  const question = questions[door.id - 1];
+  const question = currentQuestions[door.id - 1];
 
   qTitle.textContent = question.title;
   qText.textContent = question.text;
   hintBtn.disabled = false;
   hintBtn.textContent = `Use Hint (${HINT_COST} Coin)`;
 
-  toast.textContent = `Door ${door.id} challenge opened.`;
+  toast.textContent = `${activeLevel === "hidden" ? "Hidden" : "Cyber"} Door ${door.id} challenge opened.`;
   playSound("click");
 
   question.answers.forEach((answer, index) => {
@@ -1106,7 +1307,7 @@ function openQuestion(door) {
 function startQuestionTimer(question) {
   if (questionInterval) clearInterval(questionInterval);
 
-  questionTimeLeft = QUESTION_TIME;
+  questionTimeLeft = currentQuestionTime;
   questionTimer.textContent = questionTimeLeft;
 
   questionInterval = setInterval(() => {
@@ -1126,7 +1327,7 @@ function startQuestionTimer(question) {
 function useHint() {
   if (!questionOpen || !currentDoor) return;
 
-  const question = questions[currentDoor.id - 1];
+  const question = currentQuestions[currentDoor.id - 1];
 
   if (cyberCoins < HINT_COST) {
     hintText.textContent = "Not enough Cyber Coins.";
@@ -1146,9 +1347,7 @@ function useHint() {
 function answerQuestion(selected, question, timedOut) {
   if (!questionOpen) return;
 
-  answers.querySelectorAll("button").forEach(button => {
-    button.disabled = true;
-  });
+  answers.querySelectorAll("button").forEach(button => button.disabled = true);
 
   if (questionInterval) clearInterval(questionInterval);
   questionInterval = null;
@@ -1159,11 +1358,11 @@ function answerQuestion(selected, question, timedOut) {
 
   if (correct) {
     correctAnswers++;
-    score += 20;
+    score += activeLevel === "hidden" ? 35 : 20;
     cyberCoins++;
     currentDoor.unlocked = true;
 
-    feedback.textContent = "Correct answer. +20 score and +1 Cyber Coin.";
+    feedback.textContent = `Correct answer. +${activeLevel === "hidden" ? 35 : 20} score and +1 Cyber Coin.`;
     toast.textContent = `Door ${currentDoor.id} unlocked. Read the explanation, then continue.`;
 
     playSound("correct");
@@ -1175,16 +1374,14 @@ function answerQuestion(selected, question, timedOut) {
     showLearning("Correct!", question.lesson, true);
   } else {
     wrongAnswers++;
-    score = Math.max(0, score - 10);
+    score = Math.max(0, score - (activeLevel === "hidden" ? 18 : 10));
 
     buffFish();
 
     setToCell(player, currentDoor.spawn, player.size);
     doorCooldownUntil = Date.now() + 1400;
 
-    feedback.textContent = timedOut
-      ? "Time up. Fish buff activated."
-      : "Wrong answer. Fish buff activated.";
+    feedback.textContent = timedOut ? "Time up. Fish buff activated." : "Wrong answer. Fish buff activated.";
 
     playSound("wrong");
 
@@ -1198,7 +1395,6 @@ function answerQuestion(selected, question, timedOut) {
 function showLearning(title, text, correct) {
   learningTitle.textContent = title;
   learningText.textContent = text;
-
   learningModal.classList.add("active");
 
   toast.textContent = correct
@@ -1214,16 +1410,28 @@ function continueLearning() {
 function closeQuestionAndResume() {
   qModal.classList.remove("active");
 
+  const completedAllDoors = doors.every(door => door.unlocked);
+
   questionOpen = false;
   currentDoor = null;
 
   clearKeys();
+
+  if (activeLevel === "hidden" && completedAllDoors) {
+    toast.textContent = "All hidden doors unlocked. Reach the hidden exit!";
+  }
+
   resumeGame(false);
 }
 
 function buffFish() {
   fishBuffLevel++;
-  enemySpeed = Math.min(1.65, BASE_ENEMY_SPEED + fishBuffLevel * 0.10);
+
+  enemySpeed = Math.min(
+    activeLevel === "hidden" ? 2.25 : 1.65,
+    currentEnemyBaseSpeed + fishBuffLevel * (activeLevel === "hidden" ? 0.16 : 0.10)
+  );
+
   enemyGhost = true;
   enemyPath = [];
 
@@ -1264,29 +1472,12 @@ function openPasswordDoor(door) {
 function getPasswordIssues(password, confirmPassword = "") {
   const issues = [];
 
-  if (password.length < 8) {
-    issues.push("Add at least 8 characters.");
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    issues.push("Add one uppercase letter.");
-  }
-
-  if (!/[a-z]/.test(password)) {
-    issues.push("Add one lowercase letter.");
-  }
-
-  if (!/[0-9]/.test(password)) {
-    issues.push("Add one number.");
-  }
-
-  if (!/[^A-Za-z0-9]/.test(password)) {
-    issues.push("Add one special character.");
-  }
-
-  if (password !== confirmPassword) {
-    issues.push("Passwords do not match.");
-  }
+  if (password.length < 8) issues.push("Add at least 8 characters.");
+  if (!/[A-Z]/.test(password)) issues.push("Add one uppercase letter.");
+  if (!/[a-z]/.test(password)) issues.push("Add one lowercase letter.");
+  if (!/[0-9]/.test(password)) issues.push("Add one number.");
+  if (!/[^A-Za-z0-9]/.test(password)) issues.push("Add one special character.");
+  if (password !== confirmPassword) issues.push("Passwords do not match.");
 
   return issues;
 }
@@ -1333,15 +1524,15 @@ function submitPasswordDoor() {
   score += 30;
   cyberCoins++;
   currentDoor.unlocked = true;
-  currentDoor.lockedBehind = false;
+  currentDoor.lockedBehind = true;
 
   finalPasswordLocked = true;
   enemyFrozenUntil = Date.now() + 999999;
   enemyGhost = false;
   enemyPath = [];
 
-  passwordFeedback.textContent = "Strong password confirmed. Final door unlocked. The fish cannot follow you.";
-  toast.textContent = "Strong passwords protect accounts. Run to EXIT and lock the fish out!";
+  passwordFeedback.textContent = "Strong password confirmed. Final door locked. The fish cannot follow you.";
+  toast.textContent = "Strong password accepted. Final escape animation starting.";
 
   playSound("lock");
   playSound("open");
@@ -1354,8 +1545,100 @@ function submitPasswordDoor() {
     passwordOpen = false;
     currentDoor = null;
     clearKeys();
-    resumeGame(false);
-  }, 1000);
+    playFinalAnimation();
+  }, 800);
+}
+
+function playFinalAnimation() {
+  running = false;
+  paused = false;
+  clearKeys();
+
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+
+  stopMusic();
+
+  finalAnimationModal.classList.add("active");
+
+  finalAnimationVideo.currentTime = 0;
+  finalAnimationVideo.muted = !soundOn;
+
+  finalAnimationVideo.play().catch(error => {
+    console.warn("Final animation play failed:", error.message);
+
+    setTimeout(() => {
+      finalAnimationModal.classList.remove("active");
+      afterMainLevelComplete();
+    }, 3000);
+  });
+
+  finalAnimationVideo.onended = () => {
+    finalAnimationModal.classList.remove("active");
+    afterMainLevelComplete();
+  };
+}
+
+function afterMainLevelComplete() {
+  stopOverallTimer();
+
+  if (correctAnswers >= 14) {
+    hiddenLevelModal.classList.add("active");
+    playSound("bonus");
+  } else {
+    endGame(true, "main");
+  }
+}
+
+function startHiddenLevel() {
+  hiddenLevelModal.classList.remove("active");
+
+  setLevel("hidden");
+  resetState(true);
+
+  running = false;
+  paused = false;
+
+  loadingTitle.textContent = "Entering Hidden Maze...";
+  loadingText.textContent = "Loading harder questions...";
+  loadingFill.style.width = "0%";
+  loadingModal.classList.add("active");
+
+  playSound("click");
+
+  let progress = 0;
+
+  const steps = [
+    "Opening secret path...",
+    "Building confusing maze...",
+    "Increasing fish speed...",
+    "Loading advanced cyber questions...",
+    "Activating hidden doors...",
+    "Entering hidden level..."
+  ];
+
+  const interval = setInterval(() => {
+    progress++;
+
+    loadingFill.style.width = Math.min(100, Math.round((progress / steps.length) * 100)) + "%";
+    loadingText.textContent = steps[progress - 1] || "Entering hidden level...";
+
+    if (progress >= steps.length) {
+      clearInterval(interval);
+
+      setTimeout(() => {
+        loadingModal.classList.remove("active");
+        beginLevel();
+      }, 300);
+    }
+  }, 750);
+}
+
+function skipHiddenLevel() {
+  hiddenLevelModal.classList.remove("active");
+  endGame(true, "main");
 }
 
 function moveEnemy() {
@@ -1363,6 +1646,11 @@ function moveEnemy() {
 
   const enemyCenter = center(enemy, enemy.size);
   const playerCenter = center(player, player.size);
+
+  const dxToPlayer = playerCenter.x - enemyCenter.x;
+
+  if (dxToPlayer > 0) enemyFacing = "right";
+  if (dxToPlayer < 0) enemyFacing = "left";
 
   if (enemyGhost) {
     const dx = playerCenter.x - enemyCenter.x;
@@ -1379,7 +1667,7 @@ function moveEnemy() {
 
   const now = Date.now();
 
-  if (now - lastPathUpdate > 180 || enemyPath.length < 2) {
+  if (now - lastPathUpdate > 170 || enemyPath.length < 2) {
     enemyPath = findPath(cellOf(enemy, enemy.size), cellOf(player, player.size), false);
     lastPathUpdate = now;
   }
@@ -1390,6 +1678,9 @@ function moveEnemy() {
   const dx = target.x - enemyCenter.x;
   const dy = target.y - enemyCenter.y;
   const d = Math.hypot(dx, dy);
+
+  if (dx > 0) enemyFacing = "right";
+  if (dx < 0) enemyFacing = "left";
 
   if (d < 2) {
     enemyPath.shift();
@@ -1406,7 +1697,8 @@ function checkCoins() {
   for (const coin of coins) {
     if (!coin.collected && dist(playerCenter, { x: coin.x + 7, y: coin.y + 7 }) < 20) {
       coin.collected = true;
-      score += 5;
+      score += activeLevel === "hidden" ? 8 : 5;
+      cyberCoins++;
       playSound("bonus");
       updateHud();
     }
@@ -1416,33 +1708,19 @@ function checkCoins() {
 function checkCaught() {
   if (Date.now() < enemyFrozenUntil || finalPasswordLocked) return;
 
-  const catchDistance = 22 + fishBuffLevel * 2;
+  const catchDistance = 22 + fishBuffLevel * 2 + (activeLevel === "hidden" ? 4 : 0);
 
   if (dist(center(player, player.size), center(enemy, enemy.size)) < catchDistance) {
-    handlePlayerDeath("The buffed phishing fish caught you.");
+    handlePlayerDeath(activeLevel === "hidden" ? "The shadow phishing fish caught you." : "The buffed phishing fish caught you.");
   }
 }
 
 function checkWin() {
-  if (doors.every(door => door.unlocked) && dist(center(player, player.size), cellCenter(EXIT)) < 30) {
-    endGame(true);
-  }
-}
+  if (activeLevel === "main") return;
 
-function checkFinalDoorRelock() {
-  if (!doors) return;
-
-  const finalDoor = doors[doors.length - 1];
-
-  if (!finalDoor || !finalDoor.unlocked || finalDoor.lockedBehind) return;
-
-  const playerCell = cellOf(player, player.size);
-
-  if (playerCell.r < finalDoor.r || dist(center(player, player.size), cellCenter(EXIT)) < 35) {
-    finalDoor.lockedBehind = true;
-    toast.textContent = "Final door locked behind you. The fish is trapped outside.";
-    playSound("lock");
-    draw();
+  if (doors.every(door => door.unlocked) && dist(center(player, player.size), cellCenter(currentExit)) < 32) {
+    hiddenCompleted = true;
+    endGame(true, "hidden");
   }
 }
 
@@ -1451,7 +1729,7 @@ function getProgressDoorNumber() {
 
   if (active) return active.id;
 
-  return DOOR_CELLS.length;
+  return currentDoorCells.length;
 }
 
 function getEnemyReviveCell() {
@@ -1459,17 +1737,17 @@ function getEnemyReviveCell() {
   const targetDoorNumber = Math.max(1, progressDoor - 2);
   const targetDoor = doors[targetDoorNumber - 1];
 
-  if (!targetDoor) return START;
+  if (!targetDoor) return currentStart;
 
-  return targetDoor.spawn || START;
+  return targetDoor.spawn || currentStart;
 }
 
 function getPlayerRespawnCell() {
   const unlocked = doors.filter(door => door.unlocked);
 
-  if (!unlocked.length) return START;
+  if (!unlocked.length) return currentStart;
 
-  return unlocked[unlocked.length - 1].spawn || START;
+  return unlocked[unlocked.length - 1].spawn || currentStart;
 }
 
 function handlePlayerDeath(reason) {
@@ -1483,7 +1761,7 @@ function handlePlayerDeath(reason) {
   lastDeathReason = reason;
 
   if (revivesUsed >= MAX_REVIVES) {
-    endGame(false, "No revives left. You used all 2 revives.");
+    endGame(false, "dead", "No revives left. You used all 2 revives.");
     return;
   }
 
@@ -1500,14 +1778,14 @@ function handlePlayerDeath(reason) {
     reviveModal.classList.add("active");
     playSound("warning");
   } else {
-    endGame(false, "Not enough Cyber Coins to revive.");
+    endGame(false, "dead", "Not enough Cyber Coins to revive.");
   }
 }
 
 function useRevive() {
   if (revivesUsed >= MAX_REVIVES) {
     reviveModal.classList.remove("active");
-    endGame(false, "No revives left. You used all 2 revives.");
+    endGame(false, "dead", "No revives left. You used all 2 revives.");
     return;
   }
 
@@ -1538,7 +1816,7 @@ function useRevive() {
 
 function refuseRevive() {
   reviveModal.classList.remove("active");
-  endGame(false, lastDeathReason);
+  endGame(false, "dead", lastDeathReason);
 }
 
 function saveRecords() {
@@ -1547,27 +1825,29 @@ function saveRecords() {
     newTime: false
   };
 
-  if (score > bestScore) {
-    bestScore = score;
-    record.newScore = true;
-  }
+  if (activeLevel === "main") {
+    if (score > bestScore) {
+      bestScore = score;
+      record.newScore = true;
+    }
 
-  if (!bestTime || elapsed < bestTime) {
-    bestTime = elapsed;
-    record.newTime = true;
-  }
+    if (!bestTime || elapsed < bestTime) {
+      bestTime = elapsed;
+      record.newTime = true;
+    }
 
-  if (currentUser) {
-    const users = getUsers();
+    if (currentUser) {
+      const users = getUsers();
 
-    if (users[currentUser]) {
-      users[currentUser].bestScore = Math.max(users[currentUser].bestScore || 0, bestScore);
-      users[currentUser].bestTime = !users[currentUser].bestTime
-        ? bestTime
-        : Math.min(users[currentUser].bestTime, bestTime);
-      users[currentUser].gamesPlayed = (users[currentUser].gamesPlayed || 0) + 1;
+      if (users[currentUser]) {
+        users[currentUser].bestScore = Math.max(users[currentUser].bestScore || 0, bestScore);
+        users[currentUser].bestTime = !users[currentUser].bestTime
+          ? bestTime
+          : Math.min(users[currentUser].bestTime, bestTime);
+        users[currentUser].gamesPlayed = (users[currentUser].gamesPlayed || 0) + 1;
 
-      saveUsers(users);
+        saveUsers(users);
+      }
     }
   }
 
@@ -1575,13 +1855,14 @@ function saveRecords() {
 }
 
 function getBadge() {
+  if (activeLevel === "hidden" && hiddenCompleted) return "🌑 Shadow Cyber Master";
   if (correctAnswers >= 14) return "🏆 Cyber Expert";
   if (correctAnswers >= 11) return "🥈 Cyber Defender";
   if (correctAnswers >= 8) return "🥉 Cyber Learner";
   return "🛡️ Cyber Beginner";
 }
 
-function endGame(won, message) {
+function endGame(won, source = "main", message = "") {
   clearKeys();
 
   running = false;
@@ -1596,17 +1877,18 @@ function endGame(won, message) {
     const record = saveRecords();
     updateHud();
 
-    endTitle.textContent = "Final Result";
+    endTitle.textContent = source === "hidden" ? "Hidden Level Completed" : "Final Result";
     playSound("bonus");
 
     endText.innerHTML = `
       <div class="result-grid">
         <div>Player</div><strong>${currentUser || "Guest"}</strong>
+        <div>Level</div><strong>${source === "hidden" ? "Hidden Level" : "Main Level"}</strong>
         <div>Final Score</div><strong>${score}${record.newScore ? " ⭐ New Best" : ""}</strong>
         <div>Best Score</div><strong>${bestScore}</strong>
         <div>Time</div><strong>${formatTime(elapsed)}${record.newTime ? " ⭐ New Best" : ""}</strong>
-        <div>Best Time</div><strong>${bestTime ? formatTime(bestTime) : "--:--"}</strong>
         <div>Correct Answers</div><strong>${correctAnswers}/${questionsAnswered}</strong>
+        <div>Wrong Answers</div><strong>${wrongAnswers}</strong>
         <div>Hints Used</div><strong>${hintsUsed}</strong>
         <div>Revives Used</div><strong>${revivesUsed} / ${MAX_REVIVES}</strong>
         <div>Cyber Coins Left</div><strong>${cyberCoins}</strong>
@@ -1614,7 +1896,9 @@ function endGame(won, message) {
         <div>Badge</div><strong>${getBadge()}</strong>
       </div>
       <p class="small-text">
-        Strong cyber habits help you escape real online dangers. Think before you click.
+        ${source === "hidden"
+          ? "You survived the secret cyber maze and proved advanced cyber awareness."
+          : "Strong cyber habits help you escape real online dangers. Think before you click."}
       </p>
     `;
   } else {
@@ -1626,23 +1910,36 @@ function endGame(won, message) {
       <p>${message || "Game over."}</p>
       <div class="result-grid">
         <div>Player</div><strong>${currentUser || "Guest"}</strong>
+        <div>Level</div><strong>${activeLevel === "hidden" ? "Hidden Level" : "Main Level"}</strong>
         <div>Final Score</div><strong>${score}</strong>
         <div>Best Score</div><strong>${bestScore}</strong>
         <div>Time</div><strong>${formatTime(elapsed)}</strong>
-        <div>Best Time</div><strong>${bestTime ? formatTime(bestTime) : "--:--"}</strong>
         <div>Doors Completed</div><strong>${doors.filter(door => door.unlocked).length}/${doors.length}</strong>
         <div>Correct Answers</div><strong>${correctAnswers}/${questionsAnswered}</strong>
+        <div>Wrong Answers</div><strong>${wrongAnswers}</strong>
         <div>Hints Used</div><strong>${hintsUsed}</strong>
         <div>Revives Used</div><strong>${revivesUsed} / ${MAX_REVIVES}</strong>
         <div>Badge</div><strong>${getBadge()}</strong>
       </div>
-      <p class="small-text">
-        Strong cyber habits help you escape real online dangers. Think before you click.
-      </p>
+      <p class="small-text">Mistakes are part of learning. Try again and watch for cyber traps.</p>
     `;
   }
 
   endModal.classList.add("active");
+}
+
+function openCyberTips() {
+  if (!tipsModal) return;
+
+  tipsModal.classList.add("active");
+  playSound("click");
+}
+
+function closeCyberTips() {
+  if (!tipsModal) return;
+
+  tipsModal.classList.remove("active");
+  playSound("click");
 }
 
 function loop() {
@@ -1656,7 +1953,6 @@ function loop() {
   checkCoins();
   checkDoor();
   checkCaught();
-  checkFinalDoorRelock();
   checkWin();
   updateHud();
   draw();
@@ -1676,11 +1972,15 @@ function startGame() {
     return;
   }
 
+  unlockAudio();
   playSound("click");
+
+  setLevel("main");
 
   startModal.classList.remove("active");
   loadingModal.classList.add("active");
 
+  loadingTitle.textContent = "Entering Cyber Maze...";
   loadingFill.style.width = "0%";
   loadingText.textContent = "Preparing doors...";
 
@@ -1705,7 +2005,6 @@ function startGame() {
 
     const percent = Math.min(100, Math.round((progress / loadingSteps.length) * 100));
     loadingFill.style.width = percent + "%";
-
     loadingText.textContent = loadingSteps[progress - 1] || "Entering maze...";
 
     if (progress >= loadingSteps.length) {
@@ -1713,21 +2012,22 @@ function startGame() {
 
       setTimeout(() => {
         loadingModal.classList.remove("active");
-        beginGame();
+        resetState(true);
+        beginLevel();
       }, 300);
     }
   }, stepTime);
 }
 
-function beginGame() {
-  resetState();
-
+function beginLevel() {
   running = true;
   paused = false;
   elapsed = 0;
   startTime = Date.now();
 
-  toast.textContent = "Only the next door is shown. Answer carefully and survive.";
+  toast.textContent = activeLevel === "hidden"
+    ? "Hidden level started. The fish is faster and questions are harder."
+    : "Only the next door is shown. Answer carefully and survive.";
 
   startOverallTimer();
   startMusic();
@@ -1735,7 +2035,15 @@ function beginGame() {
 }
 
 function pauseGame() {
-  if (!running || questionOpen || passwordOpen || endModal.classList.contains("active")) return;
+  if (
+    !running ||
+    questionOpen ||
+    passwordOpen ||
+    endModal.classList.contains("active") ||
+    hiddenLevelModal.classList.contains("active")
+  ) {
+    return;
+  }
 
   clearKeys();
 
@@ -1746,9 +2054,7 @@ function pauseGame() {
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
 
-  if (soundBtn) {
-    soundBtn.textContent = soundOn ? "Sound: On" : "Sound: Off";
-  }
+  if (soundBtn) soundBtn.textContent = soundOn ? "Sound: On" : "Sound: Off";
 
   pauseModal.classList.add("active");
   playSound("click");
@@ -1759,16 +2065,16 @@ function resumeGame(closePause = true) {
     endModal.classList.contains("active") ||
     questionOpen ||
     passwordOpen ||
-    reviveModal.classList.contains("active")
+    reviveModal.classList.contains("active") ||
+    finalAnimationModal.classList.contains("active") ||
+    hiddenLevelModal.classList.contains("active")
   ) {
     return;
   }
 
   clearKeys();
 
-  if (closePause) {
-    pauseModal.classList.remove("active");
-  }
+  if (closePause) pauseModal.classList.remove("active");
 
   paused = false;
   running = true;
@@ -1776,33 +2082,47 @@ function resumeGame(closePause = true) {
   startOverallTimer();
   startMusic();
 
-  if (!animationId) {
-    loop();
-  }
+  if (!animationId) loop();
 }
 
-function restartGame() {
+function closeAllModals() {
   [
     pauseModal,
     qModal,
     passwordModal,
     reviveModal,
     learningModal,
+    hiddenLevelModal,
     endModal,
-    loadingModal
-  ].forEach(modal => modal.classList.remove("active"));
+    loadingModal,
+    tipsModal,
+    finalAnimationModal
+  ].forEach(modal => {
+    if (modal) modal.classList.remove("active");
+  });
+
+  if (finalAnimationVideo) {
+    finalAnimationVideo.pause();
+    finalAnimationVideo.currentTime = 0;
+  }
+}
+
+function restartGame() {
+  closeAllModals();
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
 
-  resetState();
+  resetState(true);
 
   running = true;
   paused = false;
   elapsed = 0;
   startTime = Date.now();
 
-  toast.textContent = "Restarted. Only the next door is visible.";
+  toast.textContent = activeLevel === "hidden"
+    ? "Hidden level restarted. The fish is still fast."
+    : "Restarted. Only the next door is visible.";
 
   startOverallTimer();
   startMusic();
@@ -1810,15 +2130,7 @@ function restartGame() {
 }
 
 function exitGame() {
-  [
-    pauseModal,
-    qModal,
-    passwordModal,
-    reviveModal,
-    learningModal,
-    endModal,
-    loadingModal
-  ].forEach(modal => modal.classList.remove("active"));
+  closeAllModals();
 
   if (animationId) cancelAnimationFrame(animationId);
   animationId = null;
@@ -1826,7 +2138,9 @@ function exitGame() {
   stopOverallTimer();
   stopMusic();
   clearKeys();
-  resetState();
+
+  setLevel("main");
+  resetState(true);
 
   startModal.classList.add("active");
   goSetupPage(3);
@@ -1837,11 +2151,22 @@ function exitGame() {
 document.addEventListener("keydown", event => {
   const keyPressed = event.key.toLowerCase();
 
+  if (passwordOpen && keyPressed === "enter") {
+    event.preventDefault();
+    submitPasswordDoor();
+    return;
+  }
+
   if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(keyPressed)) {
     event.preventDefault();
   }
 
   if (keyPressed === "escape") {
+    if (tipsModal && tipsModal.classList.contains("active")) {
+      closeCyberTips();
+      return;
+    }
+
     paused ? resumeGame(true) : pauseGame();
     return;
   }
@@ -1852,7 +2177,10 @@ document.addEventListener("keydown", event => {
     !paused &&
     !reviveModal.classList.contains("active") &&
     !startModal.classList.contains("active") &&
-    !loadingModal.classList.contains("active")
+    !loadingModal.classList.contains("active") &&
+    !tipsModal.classList.contains("active") &&
+    !finalAnimationModal.classList.contains("active") &&
+    !hiddenLevelModal.classList.contains("active")
   ) {
     keys[keyPressed] = true;
   }
@@ -1870,9 +2198,12 @@ window.addEventListener("visibilitychange", () => {
 
 passwordInput.addEventListener("input", updatePasswordChecks);
 passwordConfirmInput.addEventListener("input", updatePasswordChecks);
+registerPassword.addEventListener("input", updateRegisterStrength);
 
 restoreLogin();
-resetState();
+setLevel("main");
+resetState(true);
+updateRegisterStrength();
 
 fishImg.onload = draw;
 playerImg.onload = draw;

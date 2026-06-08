@@ -6,10 +6,8 @@
 <title>ClickBait - Cyber Maze</title>
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 <div class="wrapper">
-
   <div class="topbar">
     <div>
       <h1>ClickBait</h1>
@@ -18,6 +16,7 @@
   </div>
 
   <div class="hud">
+    <div>Level<br><span id="levelHud">Main</span></div>
     <div>User<br><span id="userHud">Guest</span></div>
     <div>Score<br><span id="score">0</span></div>
     <div>Best<br><span id="bestScore">0</span></div>
@@ -25,7 +24,6 @@
     <div>Coins<br><span id="cyberCoinsHud">0</span></div>
     <div>Doors<br><span id="doorsHud">0/16</span></div>
     <div>Time<br><span id="time">00:00</span></div>
-    <div>Best Time<br><span id="bestTime">--:--</span></div>
     <div>Fish<br><span id="fishHud">Buff 0</span></div>
   </div>
 
@@ -33,18 +31,11 @@
     <canvas id="game" width="1160" height="680"></canvas>
     <div id="damageFlash"></div>
 
-    <!-- START / SETUP SCREEN -->
     <div id="startModal" class="modal active">
       <div class="modal-card intro-card">
-
-        <!-- PAGE 1 -->
         <div id="setupPage1" class="setup-page active">
           <h2>Before You Play</h2>
-          <p class="small-text">
-            This game teaches cybersecurity safety through a maze challenge.
-            Please read and accept the safety rules before continuing.
-          </p>
-
+          <p class="small-text">This game teaches cybersecurity safety through a maze challenge. Please read and accept the safety rules before continuing.</p>
           <div class="panel-grid">
             <div class="info-panel">
               <h3>Terms & Conditions</h3>
@@ -56,7 +47,6 @@
                 <li>Game features may be improved later.</li>
               </ul>
             </div>
-
             <div class="info-panel">
               <h3>Parental Control</h3>
               <ul>
@@ -68,20 +58,16 @@
               </ul>
             </div>
           </div>
-
           <div class="accept-box">
             <label><input type="checkbox" id="acceptTerms"> I accept the Terms & Conditions.</label>
             <label><input type="checkbox" id="acceptParents"> I accept the Parental/Safety rules.</label>
           </div>
-
           <p id="page1Warning" class="warning-text"></p>
           <button class="restart-btn" onclick="goSetupPage(2)">Continue</button>
         </div>
 
-        <!-- PAGE 2 -->
         <div id="setupPage2" class="setup-page">
           <h2>How to Play + Game Rules</h2>
-
           <div class="panel-grid">
             <div class="info-panel">
               <h3>How to Play</h3>
@@ -96,22 +82,20 @@
                 <li>You can revive maximum 2 times only.</li>
               </ul>
             </div>
-
             <div class="info-panel">
-              <h3>Game Rules</h3>
+              <h3>Special Rules</h3>
               <ul>
-                <li>The timer starts when the game starts.</li>
+                <li>The timer starts when the level starts.</li>
                 <li>The timer keeps running during questions.</li>
                 <li>The timer only stops when the game is paused.</li>
                 <li>Touching walls reduces health by 2.</li>
                 <li>Wrong answers make the fish faster and stronger.</li>
-                <li>The fish buff lets it pass through walls for a short time.</li>
-                <li>The final door needs a strong confirmed password.</li>
-                <li>The final door locks behind you after you escape.</li>
+                <li>Main level final door needs a strong password.</li>
+                <li>Cyber Expert unlocks a hidden level.</li>
+                <li>Hidden level has 10 harder cyber doors.</li>
               </ul>
             </div>
           </div>
-
           <div class="panel-grid">
             <div class="info-panel">
               <h3>Cyber Tips</h3>
@@ -124,7 +108,6 @@
                 <li>Do not save passwords on shared computers.</li>
               </ul>
             </div>
-
             <div class="info-panel">
               <h3>Badges</h3>
               <ul>
@@ -132,88 +115,76 @@
                 <li>Cyber Defender: 11 or more correct answers.</li>
                 <li>Cyber Learner: 8 or more correct answers.</li>
                 <li>Cyber Beginner: less than 8 correct answers.</li>
-                <li>Your badge appears on the final result screen.</li>
+                <li>Shadow Cyber Master: complete hidden level.</li>
               </ul>
             </div>
           </div>
-
           <div class="button-row">
             <button onclick="goSetupPage(1)">Back</button>
             <button onclick="goSetupPage(3)">Continue</button>
           </div>
         </div>
 
-        <!-- PAGE 3 -->
         <div id="setupPage3" class="setup-page">
           <h2>Login & Start</h2>
-
-          <div class="thumbnail-box">
-            <img src="assets/game-thumbnail.jpg" alt="ClickBait Game Thumbnail">
-            <p>Prepare to escape the cyber maze.</p>
+          <div class="login-start-layout">
+            <div class="login-preview">
+              <img src="assets/game-thumbnail.jpg" alt="ClickBait Game Thumbnail">
+              <h3>ClickBait Cyber Maze</h3>
+              <p>Learn cyber safety by escaping doors, avoiding phishing traps, and surviving the angler fish.</p>
+              <div class="mini-rules">
+                <span>16 Main Doors</span>
+                <span>10 Hidden Doors</span>
+                <span>Cyber Coins</span>
+                <span>2 Revives Max</span>
+              </div>
+            </div>
+            <div class="auth-box professional-auth">
+              <div id="loginPanel">
+                <h3>Player Login</h3>
+                <p class="auth-subtitle">Login to save your best score and time.</p>
+                <input id="loginUsername" class="text-input" type="text" placeholder="Username">
+                <input id="loginPassword" class="text-input" type="password" placeholder="Password">
+                <button class="restart-btn" onclick="loginUser()">Login</button>
+                <button class="link-btn" onclick="showRegister()">Create new account</button>
+              </div>
+              <div id="registerPanel" class="hidden">
+                <h3>Create Player Account</h3>
+                <p class="auth-subtitle">Use a strong password to learn good cyber habits.</p>
+                <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
+                <input id="registerPassword" class="text-input" type="password" placeholder="Choose strong password">
+                <div id="registerStrength" class="register-strength">Password needs 8 characters, uppercase, lowercase, number, and special character.</div>
+                <button class="restart-btn" onclick="registerUser()">Register</button>
+                <button class="link-btn" onclick="showLogin()">Back to login</button>
+              </div>
+              <div id="loggedInBox" class="logged-in hidden">Logged in as <strong id="loggedInName"></strong><button class="mini-btn" onclick="logoutUser()">Logout</button></div>
+              <p id="authMessage" class="warning-text"></p>
+            </div>
           </div>
-
-          <div class="auth-box">
-            <div id="loginPanel">
-              <h3>Login</h3>
-              <input id="loginUsername" class="text-input" type="text" placeholder="Username">
-              <input id="loginPassword" class="text-input" type="password" placeholder="Password">
-              <button class="restart-btn" onclick="loginUser()">Login</button>
-              <button class="link-btn" onclick="showRegister()">Create new account</button>
-            </div>
-
-            <div id="registerPanel" class="hidden">
-              <h3>Register</h3>
-              <input id="registerUsername" class="text-input" type="text" placeholder="Choose username">
-              <input id="registerPassword" class="text-input" type="password" placeholder="Choose password">
-              <button class="restart-btn" onclick="registerUser()">Register</button>
-              <button class="link-btn" onclick="showLogin()">Back to login</button>
-            </div>
-
-            <div id="loggedInBox" class="logged-in hidden">
-              Logged in as <strong id="loggedInName"></strong>
-              <button class="mini-btn" onclick="logoutUser()">Logout</button>
-            </div>
-
-            <p id="authMessage" class="warning-text"></p>
-          </div>
-
           <div class="button-row">
             <button onclick="goSetupPage(2)">Back</button>
             <button onclick="startGame()">Start Game</button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- SEPARATE LOADING SCREEN -->
     <div id="loadingModal" class="modal">
-  <div class="loading-fullscreen">
-    <img src="assets/thumbnail-screen.png" alt="Cyber Maze Loading Screen" class="loading-bg-image">
-
-    <div class="loading-overlay"></div>
-
-    <div class="loading-content">
-      <h2>Entering Cyber Maze...</h2>
-      <p class="loading-subtitle">Prepare your mind. The phishing fish is already inside.</p>
-
-      <div class="loading-status-box">
-        <p id="loadingText">Preparing doors...</p>
-
-        <div class="loading-bar-pro">
-          <div id="loadingFill"></div>
-        </div>
-
-        <div class="loading-tips">
-          <span>Cyber Tip:</span>
-          Think before you click. Real danger often looks safe.
+      <div class="loading-fullscreen">
+        <img src="assets/thumbnail-screen.png" alt="Cyber Maze Loading Screen" class="loading-bg-image">
+        <div class="loading-overlay"></div>
+        <div class="loading-content">
+          <h2 id="loadingTitle">Entering Cyber Maze...</h2>
+          <p class="loading-subtitle">Prepare your mind. The phishing fish is already inside.</p>
+          <div class="loading-status-box">
+            <p id="loadingText">Preparing doors...</p>
+            <div class="loading-bar-pro"><div id="loadingFill"></div></div>
+            <div class="loading-tips"><span>Cyber Tip:</span> Think before you click. Real danger often looks safe.</div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-    <!-- PAUSE -->
     <div id="pauseModal" class="modal">
       <div class="modal-card">
         <h2>Paused</h2>
@@ -221,13 +192,12 @@
         <div class="button-row vertical">
           <button onclick="resumeGame()">Resume</button>
           <button onclick="toggleSound()" id="soundBtn">Sound: On</button>
-          <button onclick="restartGame()">Restart</button>
+          <button onclick="restartGame()">Restart Level</button>
           <button onclick="exitGame()">Exit Game</button>
         </div>
       </div>
     </div>
 
-    <!-- QUESTION -->
     <div id="questionModal" class="modal">
       <div class="modal-card question-card">
         <div class="question-head">
@@ -242,7 +212,6 @@
       </div>
     </div>
 
-    <!-- LEARNING -->
     <div id="learningModal" class="modal">
       <div class="modal-card learning-card">
         <h2 id="learningTitle">Learning Point</h2>
@@ -251,13 +220,10 @@
       </div>
     </div>
 
-    <!-- FINAL PASSWORD -->
     <div id="passwordModal" class="modal">
       <div class="modal-card">
         <h2>Final Door: Lock the Fish Out</h2>
-        <p class="small-text">
-          Type any password first. The door will only open if the password is strong and confirmed.
-        </p>
+        <p class="small-text">Type any password first. The door only accepts it if it is strong and confirmed.</p>
         <input id="passwordInput" class="password-input" type="text" placeholder="Create a strong password">
         <input id="passwordConfirmInput" class="password-input" type="text" placeholder="Confirm password">
         <ul id="passwordChecks" class="password-checks"></ul>
@@ -266,7 +232,6 @@
       </div>
     </div>
 
-    <!-- REVIVE -->
     <div id="reviveModal" class="modal">
       <div class="modal-card">
         <h2>Revive Available</h2>
@@ -278,25 +243,71 @@
       </div>
     </div>
 
-    <!-- END -->
+    <div id="hiddenLevelModal" class="modal">
+      <div class="modal-card hidden-level-card">
+        <h2>Secret Level Unlocked</h2>
+        <p class="small-text">You earned the <strong>Cyber Expert</strong> badge. A hidden maze has appeared.</p>
+        <p class="small-text">This level has 10 harder cyber doors, a confusing map, and a faster fish.</p>
+        <div class="button-row">
+          <button onclick="startHiddenLevel()">Yes, Enter Hidden Level</button>
+          <button onclick="skipHiddenLevel()">No, Show Result</button>
+        </div>
+      </div>
+    </div>
+
     <div id="endModal" class="modal">
       <div class="modal-card">
         <h2 id="endTitle">Final Result</h2>
         <div id="endText" class="small-text"></div>
         <div class="button-row">
-          <button onclick="restartGame()">Restart</button>
+          <button onclick="restartGame()">Restart Level</button>
+          <button onclick="openCyberTips()">Cyber Safety Tips</button>
           <button onclick="exitGame()">Exit Game</button>
         </div>
       </div>
     </div>
 
+    <div id="tipsModal" class="modal">
+      <div class="modal-card cyber-tips-card">
+        <h2>Cyber Safety Tips</h2>
+        <p class="small-text">These tips are for young players aged 11–16. Use them in school, gaming, and social media.</p>
+        <div class="tips-grid">
+          <div>1. Think before clicking any link.</div>
+          <div>2. Check the website address before logging in.</div>
+          <div>3. Never share verification codes.</div>
+          <div>4. Use strong and unique passwords.</div>
+          <div>5. Do not reuse the same password everywhere.</div>
+          <div>6. Ask an adult or teacher if a message feels suspicious.</div>
+          <div>7. Do not download free hacks, cheats, or unknown files.</div>
+          <div>8. Be careful with public WiFi when logging into accounts.</div>
+          <div>9. Do not save passwords on school or shared computers.</div>
+          <div>10. Do not trust messages only because they look professional.</div>
+          <div>11. Scammers often use fear and urgency to rush you.</div>
+          <div>12. Keep your gaming accounts protected with strong passwords.</div>
+          <div>13. Do not share private photos, address, school name, or phone number.</div>
+          <div>14. Report suspicious messages instead of replying to them.</div>
+          <div>15. When unsure, stop, check, and ask for help.</div>
+        </div>
+        <button class="restart-btn" onclick="closeCyberTips()">Back to Result</button>
+      </div>
+    </div>
+
+    <div id="finalAnimationModal" class="modal">
+      <div class="final-video-screen">
+        <video id="finalAnimationVideo" class="final-video" preload="auto">
+          <source src="assets/final-animation.mp4" type="video/mp4">
+        </video>
+        <div class="final-video-text">
+          <h2>Maze Escaped</h2>
+          <p>The strong password locked the fish out.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="toast">Accept the rules, login or register, then start the game.</div>
-  <div class="controls">Move: WASD / Arrow Keys | Pause: ESC</div>
-
+  <div class="controls">Move: WASD / Arrow Keys | Pause: ESC | Final password: Press Enter</div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>
