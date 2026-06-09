@@ -491,14 +491,18 @@ let hiddenCompleted = false;
 
 function unlockAudio() {
   if (audioUnlocked) return;
+
   audioUnlocked = true;
 
   for (const sound of Object.values(audio)) {
     sound.volume = sound === audio.bg ? 0.22 : 0.8;
-    sound.play().then(() => {
-      sound.pause();
-      sound.currentTime = 0;
-    }).catch(() => {});
+
+    sound.play()
+      .then(() => {
+        sound.pause();
+        sound.currentTime = 0;
+      })
+      .catch(() => {});
   }
 }
 
@@ -515,6 +519,7 @@ function playSound(name) {
   try {
     const clone = sound.cloneNode();
     clone.volume = sound.volume || 0.8;
+
     clone.play().catch(error => {
       console.warn("Sound play failed:", name, error.message);
     });
@@ -926,6 +931,7 @@ function resetState(keepLevel = false) {
 
   coins = currentCoinCells.map(cell => {
     const p = cellCenter(cell);
+
     return {
       ...cell,
       x: p.x - 7,
@@ -1940,6 +1946,7 @@ function openFeedbackForm() {
   if (!feedbackModal) return;
 
   feedbackThanks.textContent = "";
+  feedbackThanks.className = "small-text";
   feedbackModal.classList.add("active");
   playSound("click");
 }
@@ -1951,8 +1958,126 @@ function closeFeedbackForm() {
   playSound("click");
 }
 
+function getCheckedRadioValue(name) {
+  const selected = document.querySelector(`input[name="${name}"]:checked`);
+  return selected ? selected.value : "";
+}
+
+function getCheckedCheckboxValues(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+    .map(input => input.value);
+}
+
+function validateFeedbackForm() {
+  const requiredRadioGroups = [
+    "age",
+    "knowledge",
+    "fun",
+    "fishStrong",
+    "realLife",
+    "better",
+    "popup",
+    "passwordBetter",
+    "overallRating"
+  ];
+
+  for (const group of requiredRadioGroups) {
+    if (!getCheckedRadioValue(group)) {
+      return "Please answer all choice questions marked with * before submitting.";
+    }
+  }
+
+  if (getCheckedCheckboxValues("keepPlaying").length === 0) {
+    return "Please select at least one answer for what made you keep playing.";
+  }
+
+  return "";
+}
+
 function submitFeedbackForm() {
-  feedbackThanks.textContent = "Thank you for playing and helping us improve ClickBait!";
+  const error = validateFeedbackForm();
+
+  if (error) {
+    feedbackThanks.textContent = error;
+    feedbackThanks.className = "small-text feedback-error";
+    playSound("wrong");
+    return;
+  }
+
+  const keepPlayingAnswers = getCheckedCheckboxValues("keepPlaying");
+  const otherAnswer = $("keepPlayingOther").value.trim();
+
+  if (otherAnswer) {
+    keepPlayingAnswers.push("Other: " + otherAnswer);
+  }
+
+  const feedbackData = {
+    playerName: currentUser || "Guest",
+    submittedAt: new Date().toISOString(),
+
+    gameResult: {
+      level: activeLevel === "hidden" ? "Hidden Level" : "Main Level",
+      score: score,
+      bestScore: bestScore,
+      time: formatTime(elapsed),
+      health: health,
+      cyberCoinsLeft: cyberCoins,
+      correctAnswers: correctAnswers,
+      wrongAnswers: wrongAnswers,
+      hintsUsed: hintsUsed,
+      revivesUsed: revivesUsed,
+      fishBuffLevel: fishBuffLevel,
+      badge: getBadge()
+    },
+
+    feedback: {
+      age: getCheckedRadioValue("age"),
+      knowledgeBefore: getCheckedRadioValue("knowledge"),
+      funLevel: getCheckedRadioValue("fun"),
+      keptPlayingBecause: keepPlayingAnswers,
+      fishGettingStrongerEffect: getCheckedRadioValue("fishStrong"),
+      realLifeCyberFeeling: getCheckedRadioValue("realLife"),
+      betterAtSpottingScams: getCheckedRadioValue("better"),
+      learningPopupHelp: getCheckedRadioValue("popup"),
+      strongerPasswordAfterPlaying: getCheckedRadioValue("passwordBetter"),
+      overallRating: getCheckedRadioValue("overallRating"),
+
+      favouritePart: $("favouritePart").value.trim(),
+      annoyingPart: $("annoyingPart").value.trim(),
+      suggestedNewThing: $("newThing").value.trim()
+    }
+  };
+
+  const savedFeedback = JSON.parse(localStorage.getItem("clickbaitFeedback") || "[]");
+  savedFeedback.push(feedbackData);
+  localStorage.setItem("clickbaitFeedback", JSON.stringify(savedFeedback));
+
+  const safeUser = (currentUser || "guest")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "_");
+
+  const safeDate = new Date()
+    .toISOString()
+    .replace(/:/g, "-")
+    .replace(/\./g, "-");
+
+  const filename = `clickbait_feedback_${safeUser}_${safeDate}.json`;
+
+  const fileContent = JSON.stringify(feedbackData, null, 2);
+  const blob = new Blob([fileContent], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = filename;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+
+  URL.revokeObjectURL(url);
+
+  feedbackThanks.textContent = "Thank you for playing. Feedback saved and downloaded automatically!";
+  feedbackThanks.className = "small-text feedback-success";
   playSound("bonus");
 }
 
