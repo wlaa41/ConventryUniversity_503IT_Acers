@@ -183,6 +183,7 @@ canvas {
     transform: scale(0.97);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -727,6 +728,29 @@ button:disabled {
   box-shadow: 0 0 12px rgba(103, 232, 249, 0.35);
 }
 
+.required-star {
+  color: #f87171;
+}
+
+.rating-note {
+  color: #fde68a;
+  font-size: 10px;
+  line-height: 1.6;
+  margin: -6px 0 0;
+}
+
+.rating-row {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.feedback-error {
+  color: #fca5a5;
+}
+
+.feedback-success {
+  color: #86efac;
+}
+
 .final-video-screen {
   position: relative;
   width: 100%;
@@ -806,5 +830,9 @@ button:disabled {
   h1,
   .subtitle {
     text-align: center;
+  }
+
+  .rating-row {
+    grid-template-columns: 1fr;
   }
 }
