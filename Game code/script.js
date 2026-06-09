@@ -394,6 +394,7 @@ const endModal = $("endModal");
 const tipsModal = $("tipsModal");
 const feedbackModal = $("feedbackModal");
 const feedbackThanks = $("feedbackThanks");
+const manualFeedbackDownload = $("manualFeedbackDownload");
 const finalAnimationModal = $("finalAnimationModal");
 const finalAnimationVideo = $("finalAnimationVideo");
 
@@ -488,6 +489,21 @@ let correctAnswers = 0;
 let wrongAnswers = 0;
 let revivesUsed = 0;
 let hiddenCompleted = false;
+
+function isTypingTarget(event) {
+  const target = event.target;
+
+  if (!target) return false;
+
+  const tag = target.tagName;
+
+  return (
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT" ||
+    target.isContentEditable
+  );
+}
 
 function unlockAudio() {
   if (audioUnlocked) return;
@@ -915,7 +931,6 @@ function findPath(start, goal, blockDoors = false) {
   path.push(start);
   return path.reverse();
 }
-
 function resetState(keepLevel = false) {
   if (!keepLevel) setLevel("main");
 
@@ -1418,7 +1433,6 @@ function closeQuestionAndResume() {
 
   resumeGame(false);
 }
-
 function buffFish() {
   fishBuffLevel++;
 
@@ -1947,6 +1961,13 @@ function openFeedbackForm() {
 
   feedbackThanks.textContent = "";
   feedbackThanks.className = "small-text";
+
+  if (manualFeedbackDownload) {
+    manualFeedbackDownload.classList.add("hidden");
+    manualFeedbackDownload.removeAttribute("href");
+    manualFeedbackDownload.removeAttribute("download");
+  }
+
   feedbackModal.classList.add("active");
   playSound("click");
 }
@@ -1995,11 +2016,19 @@ function validateFeedbackForm() {
 }
 
 function submitFeedbackForm() {
+  console.log("Feedback submit button clicked.");
+
   const error = validateFeedbackForm();
 
   if (error) {
     feedbackThanks.textContent = error;
     feedbackThanks.className = "small-text feedback-error";
+
+    if (manualFeedbackDownload) {
+      manualFeedbackDownload.classList.add("hidden");
+    }
+
+    console.warn("Feedback validation stopped:", error);
     playSound("wrong");
     return;
   }
@@ -2048,9 +2077,15 @@ function submitFeedbackForm() {
     }
   };
 
-  const savedFeedback = JSON.parse(localStorage.getItem("clickbaitFeedback") || "[]");
-  savedFeedback.push(feedbackData);
-  localStorage.setItem("clickbaitFeedback", JSON.stringify(savedFeedback));
+  try {
+    const savedFeedback = JSON.parse(localStorage.getItem("clickbaitFeedback") || "[]");
+    savedFeedback.push(feedbackData);
+    localStorage.setItem("clickbaitFeedback", JSON.stringify(savedFeedback));
+
+    console.log("Feedback saved in localStorage:", feedbackData);
+  } catch (error) {
+    console.error("LocalStorage save failed:", error);
+  }
 
   const safeUser = (currentUser || "guest")
     .toLowerCase()
@@ -2067,17 +2102,27 @@ function submitFeedbackForm() {
   const blob = new Blob([fileContent], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
+  if (manualFeedbackDownload) {
+    manualFeedbackDownload.href = url;
+    manualFeedbackDownload.download = filename;
+    manualFeedbackDownload.textContent = "Download Feedback File";
+    manualFeedbackDownload.classList.remove("hidden");
+  }
+
   const downloadLink = document.createElement("a");
   downloadLink.href = url;
   downloadLink.download = filename;
+  downloadLink.style.display = "none";
+
   document.body.appendChild(downloadLink);
   downloadLink.click();
   document.body.removeChild(downloadLink);
 
-  URL.revokeObjectURL(url);
-
-  feedbackThanks.textContent = "Thank you for playing. Feedback saved and downloaded automatically!";
+  feedbackThanks.textContent = "Thank you for playing. Feedback saved in browser. If it did not download automatically, click Download Feedback File.";
   feedbackThanks.className = "small-text feedback-success";
+
+  console.log("Feedback download prepared:", filename);
+
   playSound("bonus");
 }
 
@@ -2291,18 +2336,19 @@ function exitGame() {
 
 document.addEventListener("keydown", event => {
   const keyPressed = event.key.toLowerCase();
+  const typing = isTypingTarget(event);
 
-  if (passwordOpen && keyPressed === "enter") {
+  if (passwordOpen && keyPressed === "enter" && !typing) {
     event.preventDefault();
     submitPasswordDoor();
     return;
   }
 
-  if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(keyPressed)) {
+  if (!typing && ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(keyPressed)) {
     event.preventDefault();
   }
 
-  if (keyPressed === "escape") {
+  if (!typing && keyPressed === "escape") {
     if (feedbackModal && feedbackModal.classList.contains("active")) {
       closeFeedbackForm();
       return;
@@ -2318,6 +2364,7 @@ document.addEventListener("keydown", event => {
   }
 
   if (
+    !typing &&
     !questionOpen &&
     !passwordOpen &&
     !paused &&
@@ -2334,6 +2381,7 @@ document.addEventListener("keydown", event => {
 });
 
 document.addEventListener("keyup", event => {
+  if (isTypingTarget(event)) return;
   keys[event.key.toLowerCase()] = false;
 });
 
