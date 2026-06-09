@@ -366,6 +366,7 @@
         </p>
 
         <div class="feedback-form">
+
           <label>1. How old are you? <span class="required-star">*</span></label>
           <div class="option-row">
             <label><input type="radio" name="age" value="10 or under"> 10 or under</label>
@@ -401,6 +402,7 @@
             <label><input type="checkbox" name="keepPlaying" value="The hidden level"> The hidden level</label>
             <label><input type="checkbox" name="keepPlaying" value="Nothing really"> Nothing really</label>
           </div>
+
           <input id="keepPlayingOther" class="feedback-input" type="text" placeholder="Other...">
 
           <label>5. When you got a question wrong, did the fish getting stronger make you think more carefully next time? <span class="required-star">*</span></label>
@@ -447,6 +449,7 @@
 
           <label>10. Overall, how would you rate the game? <span class="required-star">*</span></label>
           <p class="rating-note">1 = Very good, 5 = Very poor</p>
+
           <div class="option-row rating-row">
             <label><input type="radio" name="overallRating" value="1 - Very good"> 1</label>
             <label><input type="radio" name="overallRating" value="2 - Good"> 2</label>
@@ -466,10 +469,15 @@
 
           <p id="feedbackThanks" class="small-text"></p>
 
+          <a id="manualFeedbackDownload" class="manual-download hidden" href="#" download>
+            Download Feedback File
+          </a>
+
           <div class="button-row">
             <button onclick="submitFeedbackForm()">Submit Feedback</button>
             <button onclick="closeFeedbackForm()">Back</button>
           </div>
+
         </div>
       </div>
     </div>
@@ -491,6 +499,7 @@
 
   <div id="toast">Accept the rules, login or register, then start the game.</div>
   <div class="controls">Move: WASD / Arrow Keys | Pause: ESC | Final password: Press Enter</div>
+
 </div>
 
 <script src="script.js"></script>
