@@ -4,7 +4,7 @@
 
 > Built for **503IT Communication and Collaboration** at Coventry University.
 
-![ClickBait banner](docs/screenshots/banner.png) 
+![ClickBait banner](Game-Components/game-thumbnail.jpg) 
 
 ---
 
@@ -59,7 +59,7 @@ No installation or build step is required.
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-org>/clickbait.git
+git clone https://github.com/wlaa41/ConventryUniversity_503IT_Acers
 cd clickbait
 ```
 
