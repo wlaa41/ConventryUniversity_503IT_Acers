@@ -4,7 +4,7 @@
 
 > Built for **503IT Communication and Collaboration** at Coventry University.
 
-![ClickBait banner](docs/screenshots/banner.png)
+![ClickBait banner](docs/screenshots/banner.png) 
 
 ---
 
