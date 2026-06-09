@@ -172,3 +172,13 @@ For help with the project, users can read this README, check the comments inside
 Thanks to **Prof. Will Jamous**, our module instructor, for guiding us during the project and helping us stay focused on teamwork, communication, and realistic project scope.
 
 This project was created as part of university coursework for **503IT Communication and Collaboration** at Coventry University.
+
+## Group Members - Acers
+
+| # | GitHub Username | Profile |
+|---|---|---|
+| 1 | `sarthak-44` | https://github.com/sarthak-44 |
+| 2 | `abhicrestha22-sketch` | https://github.com/abhicrestha22-sketch |
+| 3 | `ginmartinii` | https://github.com/ginmartinii |
+| 4 | `Sureshh369` | https://github.com/Sureshh369 |
+| 5 | `yuwansqya16-stack` | https://github.com/yuwansqya16-stack |
