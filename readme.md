@@ -163,7 +163,7 @@ For help with the project, users can read this README, check the comments inside
 | Sarthak Lamichhane | 15903541 | [@sarthak-44](https://github.com/sarthak-44) | Programmer and Debugging |
 | Suresh Sapkota | 16028744 | [@Sureshh369](https://github.com/Sureshh369) | UX/UI Designer |
 | Yuwan Shakya | 15949044 | [@yuwansqya16-stack](https://github.com/yuwansqya16-stack) | Content Researcher |
-| Abhisek Shrestha |15599436:|---|Artist & Asset Researcher|
+| Abhisek Shrestha |15599436:|@Abhicrestha22-sketch|Artist & Asset Researcher|
 
 ---
 
