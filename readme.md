@@ -141,14 +141,6 @@ No framework was used, so the game can run directly in the browser without insta
 
 ---
 
-## Screenshots
-
-| Loading Screen | Maze Gameplay | Question Popup |
-|---|---|---|
-| ![](docs/screenshots/loading.png) | ![](docs/screenshots/maze.png) | ![](docs/screenshots/question.png) |
-
----
-
 ## Where to Get Help
 
 For help with the project, users can read this README, check the comments inside `script.js`, contact one of the project team members or open an issue on the GitHub repository.
@@ -163,7 +155,8 @@ For help with the project, users can read this README, check the comments inside
 | Sarthak Lamichhane | 15903541 | [@sarthak-44](https://github.com/sarthak-44) | Programmer and Debugging |
 | Suresh Sapkota | 16028744 | [@Sureshh369](https://github.com/Sureshh369) | UX/UI Designer |
 | Yuwan Shakya | 15949044 | [@yuwansqya16-stack](https://github.com/yuwansqya16-stack) | Content Researcher |
-| Abhisek Shrestha |15599436:|@Abhicrestha22-sketch|Artist & Asset Researcher|
+| Abhisek Shrestha |15599436:|[@Abhicrestha22-sketch](https://github.com/abhicrestha22-sketch)|Artist & Asset Researcher|
+
 
 ---
 
