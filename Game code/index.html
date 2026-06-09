@@ -366,93 +366,103 @@
         </p>
 
         <div class="feedback-form">
-          <label>1. How old are you?</label>
+          <label>1. How old are you? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="age"> 10 or under</label>
-            <label><input type="radio" name="age"> 11-16</label>
-            <label><input type="radio" name="age"> Above 16</label>
+            <label><input type="radio" name="age" value="10 or under"> 10 or under</label>
+            <label><input type="radio" name="age" value="11-16"> 11-16</label>
+            <label><input type="radio" name="age" value="Above 16"> Above 16</label>
           </div>
 
-          <label>2. Before playing, how much did you know about phishing and online scams?</label>
+          <label>2. Before playing, how much did you know about phishing and online scams? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="knowledge"> I knew a lot</label>
-            <label><input type="radio" name="knowledge"> I knew a little</label>
-            <label><input type="radio" name="knowledge"> I had heard of it</label>
-            <label><input type="radio" name="knowledge"> I had no idea what it meant</label>
+            <label><input type="radio" name="knowledge" value="I knew a lot"> I knew a lot</label>
+            <label><input type="radio" name="knowledge" value="I knew a little"> I knew a little</label>
+            <label><input type="radio" name="knowledge" value="I had heard of it"> I had heard of it</label>
+            <label><input type="radio" name="knowledge" value="I had no idea what it meant"> I had no idea what it meant</label>
           </div>
 
-          <label>3. How fun was the game?</label>
+          <label>3. How fun was the game? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="fun"> Super fun</label>
-            <label><input type="radio" name="fun"> Pretty fun</label>
-            <label><input type="radio" name="fun"> It was okay</label>
-            <label><input type="radio" name="fun"> Not that fun</label>
-            <label><input type="radio" name="fun"> The fish ruined my day</label>
+            <label><input type="radio" name="fun" value="Super fun"> Super fun</label>
+            <label><input type="radio" name="fun" value="Pretty fun"> Pretty fun</label>
+            <label><input type="radio" name="fun" value="It was okay"> It was okay</label>
+            <label><input type="radio" name="fun" value="Not that fun"> Not that fun</label>
+            <label><input type="radio" name="fun" value="The fish ruined my day"> The fish ruined my day</label>
           </div>
 
-          <label>4. What made you want to keep playing?</label>
+          <label>4. What made you want to keep playing? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="checkbox"> Escaping the maze</label>
-            <label><input type="checkbox"> Unlocking doors</label>
-            <label><input type="checkbox"> The fish chasing me</label>
-            <label><input type="checkbox"> Getting Cyber Coins</label>
-            <label><input type="checkbox"> Trying to get a better badge</label>
-            <label><input type="checkbox"> The final password door</label>
-            <label><input type="checkbox"> The hidden level</label>
-            <label><input type="checkbox"> Nothing really</label>
+            <label><input type="checkbox" name="keepPlaying" value="Escaping the maze"> Escaping the maze</label>
+            <label><input type="checkbox" name="keepPlaying" value="Unlocking doors"> Unlocking doors</label>
+            <label><input type="checkbox" name="keepPlaying" value="The fish chasing me"> The fish chasing me</label>
+            <label><input type="checkbox" name="keepPlaying" value="Getting Cyber Coins"> Getting Cyber Coins</label>
+            <label><input type="checkbox" name="keepPlaying" value="Trying to get a better badge"> Trying to get a better badge</label>
+            <label><input type="checkbox" name="keepPlaying" value="The final password door"> The final password door</label>
+            <label><input type="checkbox" name="keepPlaying" value="The hidden level"> The hidden level</label>
+            <label><input type="checkbox" name="keepPlaying" value="Nothing really"> Nothing really</label>
           </div>
-          <input class="feedback-input" type="text" placeholder="Other...">
+          <input id="keepPlayingOther" class="feedback-input" type="text" placeholder="Other...">
 
-          <label>5. When you got a question wrong, did the fish getting stronger make you think more carefully next time?</label>
+          <label>5. When you got a question wrong, did the fish getting stronger make you think more carefully next time? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="fishStrong"> Yes</label>
-            <label><input type="radio" name="fishStrong"> Sometimes</label>
-            <label><input type="radio" name="fishStrong"> Not really</label>
-            <label><input type="radio" name="fishStrong"> I just panicked</label>
-            <label><input type="radio" name="fishStrong"> I didn’t notice</label>
-          </div>
-
-          <label>6. Did the cyber questions feel like things that could happen online in real life?</label>
-          <div class="option-row">
-            <label><input type="radio" name="realLife"> Yes, definitely</label>
-            <label><input type="radio" name="realLife"> Some of them</label>
-            <label><input type="radio" name="realLife"> Not really</label>
-            <label><input type="radio" name="realLife"> I’m not sure</label>
+            <label><input type="radio" name="fishStrong" value="Yes"> Yes</label>
+            <label><input type="radio" name="fishStrong" value="Sometimes"> Sometimes</label>
+            <label><input type="radio" name="fishStrong" value="Not really"> Not really</label>
+            <label><input type="radio" name="fishStrong" value="I just panicked"> I just panicked</label>
+            <label><input type="radio" name="fishStrong" value="I didn’t notice"> I didn’t notice</label>
           </div>
 
-          <label>7. After playing, do you feel better at spotting phishing or scam messages?</label>
+          <label>6. Did the cyber questions feel like things that could happen online in real life? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="better"> Yes, much better</label>
-            <label><input type="radio" name="better"> A little better</label>
-            <label><input type="radio" name="better"> Not sure</label>
-            <label><input type="radio" name="better"> No</label>
+            <label><input type="radio" name="realLife" value="Yes, definitely"> Yes, definitely</label>
+            <label><input type="radio" name="realLife" value="Some of them"> Some of them</label>
+            <label><input type="radio" name="realLife" value="Not really"> Not really</label>
+            <label><input type="radio" name="realLife" value="I’m not sure"> I’m not sure</label>
           </div>
 
-          <label>8. Did the learning popups help, or did you ignore them like Terms and Conditions?</label>
+          <label>7. After playing, do you feel better at spotting phishing or scam messages? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="popup"> They helped a lot</label>
-            <label><input type="radio" name="popup"> They helped a little</label>
-            <label><input type="radio" name="popup"> I read some of them</label>
-            <label><input type="radio" name="popup"> I skipped them</label>
-            <label><input type="radio" name="popup"> I didn’t notice them</label>
+            <label><input type="radio" name="better" value="Yes, much better"> Yes, much better</label>
+            <label><input type="radio" name="better" value="A little better"> A little better</label>
+            <label><input type="radio" name="better" value="Not sure"> Not sure</label>
+            <label><input type="radio" name="better" value="No"> No</label>
           </div>
 
-          <label>9. After playing, would you make your own passwords stronger?</label>
+          <label>8. Did the learning popups help, or did you ignore them like Terms and Conditions? <span class="required-star">*</span></label>
           <div class="option-row">
-            <label><input type="radio" name="passwordBetter"> Yes</label>
-            <label><input type="radio" name="passwordBetter"> Maybe</label>
-            <label><input type="radio" name="passwordBetter"> Probably not</label>
-            <label><input type="radio" name="passwordBetter"> My password is already unbreakable… I think</label>
+            <label><input type="radio" name="popup" value="They helped a lot"> They helped a lot</label>
+            <label><input type="radio" name="popup" value="They helped a little"> They helped a little</label>
+            <label><input type="radio" name="popup" value="I read some of them"> I read some of them</label>
+            <label><input type="radio" name="popup" value="I skipped them"> I skipped them</label>
+            <label><input type="radio" name="popup" value="I didn’t notice them"> I didn’t notice them</label>
           </div>
 
-          <label>10. What was your favourite part of the game?</label>
-          <textarea class="feedback-textarea"></textarea>
+          <label>9. After playing, would you make your own passwords stronger? <span class="required-star">*</span></label>
+          <div class="option-row">
+            <label><input type="radio" name="passwordBetter" value="Yes"> Yes</label>
+            <label><input type="radio" name="passwordBetter" value="Maybe"> Maybe</label>
+            <label><input type="radio" name="passwordBetter" value="Probably not"> Probably not</label>
+            <label><input type="radio" name="passwordBetter" value="My password is already unbreakable… I think"> My password is already unbreakable… I think</label>
+          </div>
 
-          <label>11. What was the most annoying part of the game?</label>
-          <textarea class="feedback-textarea"></textarea>
+          <label>10. Overall, how would you rate the game? <span class="required-star">*</span></label>
+          <p class="rating-note">1 = Very good, 5 = Very poor</p>
+          <div class="option-row rating-row">
+            <label><input type="radio" name="overallRating" value="1 - Very good"> 1</label>
+            <label><input type="radio" name="overallRating" value="2 - Good"> 2</label>
+            <label><input type="radio" name="overallRating" value="3 - Okay"> 3</label>
+            <label><input type="radio" name="overallRating" value="4 - Poor"> 4</label>
+            <label><input type="radio" name="overallRating" value="5 - Very poor"> 5</label>
+          </div>
 
-          <label>12. If you could add one new thing to the game, what would it be?</label>
-          <textarea class="feedback-textarea"></textarea>
+          <label>11. What was your favourite part of the game?</label>
+          <textarea id="favouritePart" class="feedback-textarea"></textarea>
+
+          <label>12. What was the most annoying part of the game?</label>
+          <textarea id="annoyingPart" class="feedback-textarea"></textarea>
+
+          <label>13. If you could add one new thing to the game, what would it be?</label>
+          <textarea id="newThing" class="feedback-textarea"></textarea>
 
           <p id="feedbackThanks" class="small-text"></p>
 
