@@ -1,95 +1,119 @@
 # 6th Team Meeting Minutes
 
-**Module:** 503IT Communication and Collaboration  
-**Assignment Title:** Collaborative Solution Development and Professional Reflection  
-**Project:** Cybersecurity Educational Game Prototype  
+**Module:** 503IT Communication and Collaboration
+**Assignment Title:** Collaborative Solution Development and Professional Reflection
+**Project:** Cybersecurity Educational Game Prototype
 
 ---
+
 ## Meeting Details
 
-| Item | Details |
-|---|---|
-| **Date** | 28 May 2026 |
-| **Time** | 10:30 PM |
-| **Location / Platform** | Microsoft Teams |
-| **Chair** | Sarthak Lamichhane |
-| **Minute-Taker** | Abhisek Shrestha |
-| **Attendees** | Sarthak, Abhisek, Roshana, Yuwan |
-| **Absentees** | Suresh |
+| Item                    | Details                          |
+| ----------------------- | -------------------------------- |
+| **Date**                | 28 May 2026                      |
+| **Time**                | 10:30 PM                         |
+| **Location / Platform** | Microsoft Teams                  |
+| **Chair**               | Roshana                          |
+| **Minute-Taker**        | Abhisek Shrestha                 |
+| **Attendees**           | Sarthak, Abhisek, Roshana, Yuwan |
+| **Absentees**           | Suresh                           |
 
-> **Date correction note:** The source file listed this meeting as **28/06/2026**, but this appears inconsistent with the assignment timeline and surrounding meetings. It has been corrected to **28 May 2026**. The Monday deadline has been written as **01 June 2026**.
+---
 
 ## Meeting Purpose
 
-The purpose of this meeting was to review feedback, improve the game idea, finalise the game concept, divide tasks, and agree on how the team would coordinate during the final development stage.
+The purpose of this meeting was to review the current project direction and agree on a more realistic game concept that could be completed within the available time. The team decided to change the entire game into a simpler maze-based cybersecurity game so that the workload could be balanced more fairly between members. The meeting also focused on discussing sprint expectations, compliance with the assignment brief, and what should not be repeated in the next sprint.
+
+---
 
 ## Agenda Items
 
-1. Discuss changes to the game idea.
-2. Review feedback and finalise the game concept.
-3. Divide tasks among team members.
-4. Finalise game features, flow, and requirements.
-5. Discuss team coordination and mutual support.
-6. Agree on deadlines for completing the development work.
+1. Review the existing game concept and development progress.
+2. Discuss whether the current game idea was too complex for the remaining time.
+3. Decide on a simpler and more achievable game direction.
+4. Discuss workload balance between team members.
+5. Identify issues from the previous sprint that should not be repeated.
+6. Communicate expectations for the next sprint.
+7. Confirm compliance with the assignment brief and project requirements.
+8. Agree on immediate development actions.
+
+---
 
 ## Discussion Summary
 
-The team discussed improvements to the original game idea and reviewed how the game could be made more engaging and unique. Some features and mechanics were modified so that the prototype would be clearer, more playable, and more suitable for the assignment brief.
+The team reviewed the existing game idea and discussed the challenges faced during development. The previous concept was becoming too complex because it required multiple features, advanced interactions, more design work, and a heavier coding workload. This created a risk that some members would have too much work while others would have fewer clear tasks.
 
-The final concept was approved by the attending members. The team agreed on the genre, gameplay style, storyline, characters, levels, and user interface direction. The team also confirmed that the game should include educational cybersecurity questions and feedback so that the player learns while playing.
+To solve this, the team agreed to change the entire game into a simpler maze game. This new direction was selected because it would be easier to develop, easier to test, and easier for all members to contribute to. The maze game would still meet the assignment brief by including cybersecurity learning through questions, challenges, feedback, and safe online behaviour messages.
 
-The team then divided tasks based on each member’s strengths. Development, design, testing, educational content, UI, and animation work were assigned. The team also agreed that regular communication and mutual support were needed to complete the project on time.
+The team also discussed what should not be repeated in the next sprint. Members agreed that unclear task ownership, delayed updates, uneven workload, and adding too many features late in development should be avoided. The team communicated expectations clearly and agreed that each member must complete their assigned work, update the team regularly, and contribute evidence through development, design, research, testing, or documentation.
+
+The team also discussed compliance with the assignment requirements. The group agreed that the new maze game must remain educational, age-appropriate, accessible, and suitable for demonstration. Everyone agreed with the new direction, and development of the revised maze game would begin immediately.
+
+---
 
 ## Decisions Made
 
-| No. | Decision | Reason / Justification |
-|---|---|---|
-| 1 | The game idea was updated and improved. | Feedback showed that the concept needed to be clearer and more engaging. |
-| 2 | The final game concept was approved by attending members. | This gives the team one clear direction for development. |
-| 3 | The game genre, gameplay style, and target audience were confirmed. | These decisions support consistency in design and presentation. |
-| 4 | Storyline, characters, levels, and UI direction were finalised. | These are needed to complete the prototype and presentation. |
-| 5 | Tasks were divided based on skills and responsibilities. | This improves accountability and helps manage workload. |
-| 6 | The team agreed to maintain regular communication and support each other. | Strong communication is needed to manage time and solve issues. |
-| 7 | The development part should be completed by the end of the week. | This leaves time for testing, improvement, and presentation preparation. |
+| No. | Decision                                                         | Reason / Justification                                                                                             |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 1   | The entire game concept was changed to a simple maze game.       | The previous idea was too complex for the available time and created workload imbalance.                           |
+| 2   | The maze game will still include cybersecurity learning content. | This ensures the prototype remains aligned with the assignment brief.                                              |
+| 3   | Development will begin immediately on the revised concept.       | Starting straight away helps reduce delays and gives more time for testing.                                        |
+| 4   | The next sprint will avoid repeating previous issues.            | The team identified that unclear tasks, weak communication, and late feature changes caused problems.              |
+| 5   | Workload will be balanced more fairly across the team.           | A simpler maze game allows each member to contribute through coding, design, research, testing, and documentation. |
+| 6   | Team expectations were communicated clearly.                     | Clear expectations improve accountability and reduce confusion during the next sprint.                             |
+| 7   | The game must remain compliant with the assignment brief.        | The prototype must be educational, testable, age-appropriate, and suitable for demonstration.                      |
+
+---
 
 ## Action Items
 
-| Task / Action | Responsible Person | Deadline / Next Step |
-|---|---|---|
-| Coding and debugging | Sarthak | Complete core development by 01 June 2026 |
-| Design and reviewing | Roshana | Review design and gameplay flow |
-| Add features | Abhisek | Add agreed extra features into the prototype |
-| Research cybersecurity questions | Yuwan | Prepare suitable educational questions |
-| UI design and animation | Suresh | Complete assigned UI and animation work after catching up |
-| Support testing and final review | Whole Team | Ongoing before final submission |
+| Task / Action                                         | Responsible Person | Deadline / Next Step                     |
+| ----------------------------------------------------- | ------------------ | ---------------------------------------- |
+| Begin coding the revised maze game prototype          | Sarthak            | Start immediately                        |
+| Review maze layout and gameplay flow                  | Roshana            | Prepare design feedback for next sprint  |
+| Add agreed features into the simplified maze game     | Abhisek            | Support development immediately          |
+| Research cybersecurity questions and learning prompts | Yuwan              | Prepare suitable educational content     |
+| UI design and animation support                       | Suresh             | Catch up after receiving meeting summary |
+| Test maze flow, questions, and player progression     | Whole Team         | Ongoing during next sprint               |
+| Avoid repeating previous sprint issues                | Whole Team         | Apply during next sprint                 |
+| Maintain regular communication and progress updates   | Whole Team         | Ongoing                                  |
+
+---
 
 ## Communication and Collaboration Evidence
 
-This meeting showed collaborative decision-making because the team reviewed feedback, improved the game concept, and agreed on final responsibilities. The team also discussed coordination and committed to supporting each other during the development stage. The meeting helped create a clear link between planning, development, testing, and presentation preparation.
+This meeting showed strong collaborative decision-making because the team openly reviewed the problems with the previous concept and agreed on a more achievable solution. The decision to change to a simple maze game showed problem-solving and adaptability. The team also communicated expectations clearly, discussed compliance with the assignment brief, and agreed that development should begin immediately. This provides evidence of planning, reflection, workload management, and professional team coordination.
+
+---
 
 ## Risks / Issues Identified
 
-| Risk / Issue | Possible Impact | Planned Response |
-|---|---|---|
-| Late changes to the game idea may affect development time. | The prototype may not be completed fully. | Keep changes focused on essential improvements. |
-| Suresh was absent from the final concept discussion. | He may miss key decisions about UI and animation. | Share the meeting summary and assigned tasks with him. |
-| Coding, design, and testing may overlap heavily. | Bugs or unfinished sections may remain. | Use regular updates and test each completed feature. |
-| Educational questions may not match the target audience. | Learning value may be weaker. | Keep questions simple, relevant, and age-appropriate. |
+| Risk / Issue                                                 | Possible Impact                                           | Planned Response                                                                     |
+| ------------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Changing the whole game concept may affect development time. | The team may need to rebuild parts of the prototype.      | Start development immediately and keep the maze game simple.                         |
+| Previous sprint issues may be repeated.                      | Progress may slow down again.                             | Avoid unclear task ownership, delayed updates, and unnecessary extra features.       |
+| Workload may still become uneven.                            | Some members may carry more responsibility than others.   | Divide tasks clearly and check progress regularly.                                   |
+| Suresh was absent from the discussion.                       | He may miss the new game direction and task expectations. | Share the meeting summary and updated responsibilities with him.                     |
+| The simplified game may lose educational value.              | The game may not fully meet the client brief.             | Include cybersecurity questions, feedback, and learning prompts throughout the maze. |
+
+---
 
 ## Absent Note
 
-| Absent Member | Reason Given |
-|---|---|
-| **Suresh** | Suresh informed the team that he was absent due to personal work. |
+| Absent Member | Reason Given                                                      |
+| ------------- | ----------------------------------------------------------------- |
+| **Suresh**    | Suresh informed the team that he was absent due to personal work. |
 
-## Meeting Screenshot / Proof of Meeting
 
-A screenshot of the team communication was included in the original file as proof of meeting. It shows task discussion and planning messages, including work such as questions for accessibility and game layout, design logo, and sound effects.
+---
 
 ## Next Meeting Plan
 
-The next meeting should focus on checking completed tasks, testing the latest prototype, fixing bugs, and preparing final evidence for the presentation and individual portfolios.
+The next meeting should focus on reviewing the first version of the revised maze game, checking whether all members have started their assigned work, testing the basic maze flow, and confirming that the new sprint avoids the issues identified in this meeting.
+
+---
 
 ## Meeting Outcome
 
-The sixth meeting helped the team finalise the improved game concept, divide responsibilities, and agree on a clear plan for completing the development work. It also provided evidence of professional coordination, task allocation, and reflective problem-solving.
+The sixth meeting helped the team make an important project decision by changing the entire game into a simpler maze game. This decision was made to balance workload, improve development progress, and keep the project achievable. The team discussed what should not be repeated in the next sprint, communicated expectations clearly, checked compliance with the assignment brief, and agreed that development would begin immediately.
+
